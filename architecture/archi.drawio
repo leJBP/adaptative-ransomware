@@ -1,0 +1,35 @@
+<mxfile host="65bd71144e">
+    <diagram id="bIugP8Ds-58NL2-PPws4" name="Page-1">
+        <mxGraphModel dx="1451" dy="1003" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Connexion&lt;/font&gt;" style="edgeStyle=none;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=30;" edge="1" parent="1" source="2" target="3">
+                    <mxGeometry x="-0.125" y="-50" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="2" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Victime&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="100" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Envoi clé&lt;br&gt;chiffrement&lt;/font&gt;" style="edgeStyle=none;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="1" source="3" target="2">
+                    <mxGeometry y="-50" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Attaquant&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="360" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="650" y="200" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="labelPosition=right;align=left;strokeWidth=2;shape=mxgraph.mockup.markup.curlyBrace;html=1;shadow=0;dashed=0;strokeColor=#000000;direction=north;fontSize=20;rotation=-180;" vertex="1" parent="8">
+                    <mxGeometry width="20" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Chiffrement de&amp;nbsp;&lt;br&gt;bout en bout" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=20;" vertex="1" parent="8">
+                    <mxGeometry x="20" y="50" width="160" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
