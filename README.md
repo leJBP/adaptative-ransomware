@@ -8,7 +8,7 @@ Ransomware based on elliptic curve
     - Java (attaquant)
     - C (victime)
 - Génération des clés
-- Chiffrement utilisé
+- Chiffrement utilisé (RSA)
 - Façon de procéder
 - Stockage des clés
 - Conception du programme
@@ -22,8 +22,8 @@ source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomwar
 - [ ] Retrieve key for encryption from attacker server
 - [ ] Daemon
 - [ ] Retrieve key for decryption from attacker server
-- [ ] Encrypt with ECC
-- [ ] Decrypt ECC
+- [ ] Encrypt RSA
+- [ ] Decrypt RSA
 - [ ] Main file
 
 
