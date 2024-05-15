@@ -51,7 +51,14 @@ static void analyze_path(listFileData* p_listFileData, char* p_path)
                 }
                 strcpy(p_fileName, dp->d_name);
                 //printf("%s%s\n", p_path, p_fileName);
-                add_file(p_listFileData, p_fileName, p_path);
+                char* p_filePath = malloc(strlen(p_path) + 1);
+                if (p_filePath == NULL)
+                {
+                    fprintf(stderr, "Error: malloc failed\n");
+                    exit(EXIT_FAILURE);
+                }
+                strcpy(p_filePath, p_path);
+                add_file(p_listFileData, p_fileName, p_filePath);
             }
 
             // Construct new path from our base path
@@ -108,6 +115,7 @@ void free_path_data(listFileData* p_listFileData)
     {
         p_nextFileData = p_currentFileData->p_next;
         free(p_currentFileData->p_name); // free memory of file name
+        free(p_currentFileData->p_path); // free memory of file path
         free(p_currentFileData); // free memory of file data struct
         p_currentFileData = p_nextFileData;
     }
