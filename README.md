@@ -22,8 +22,8 @@ source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomwar
 - [ ] Retrieve key for encryption from attacker server
 - [ ] Daemon
 - [ ] Retrieve key for decryption from attacker server
-- [ ] Encrypt RSA
-- [ ] Decrypt RSA
+- [x] Encrypt RSA
+- [x] Decrypt RSA
 - [ ] Main file
 
 
