@@ -18,13 +18,13 @@ Ransomware based on elliptic curve
 source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomware/4594
 
 - [x] Find files to encrypt
-- [] Dropper
-- [] Retrieve key for encryption from attacker server
-- [] Daemon
-- [] Retrieve key for decryption from attacker server
-- [] Encrypt with ECC
-- [] Decrypt ECC
-- [] Main file
+- [ ] Dropper
+- [ ] Retrieve key for encryption from attacker server
+- [ ] Daemon
+- [ ] Retrieve key for decryption from attacker server
+- [ ] Encrypt with ECC
+- [ ] Decrypt ECC
+- [ ] Main file
 
 
 ##### Syntaxe pour le C
