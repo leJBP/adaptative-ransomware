@@ -108,7 +108,9 @@ int main(int argc, char const *argv[])
     printf("[+] Encryption key GET success\n");
 
     /* Encrypt files */
+    printf("[+] Encrypting files\n");
     encrypt_files(p_listFileData, p_pubKey);
+    printf("[+] Files encrypted\n");
 
     RSA_free(p_pubKey);
 
@@ -126,7 +128,9 @@ int main(int argc, char const *argv[])
     printf("[+] Encryption key GET success\n");
 
     /* Decrypt files */
+    printf("[+] Decrypting files\n");
     decrypt_files(p_listFileData, p_privKey);
+    printf("[+] Files decrypted\n");
 
     RSA_free(p_privKey);
 
