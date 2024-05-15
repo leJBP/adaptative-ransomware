@@ -18,7 +18,6 @@ static void add_file(listFileData* p_listFileData, char* p_name, char* p_path)
     p_newFileData->p_name = p_name;
     p_newFileData->p_path = p_path;
     p_newFileData->p_next = p_listFileData->p_head; // Linking to the previous head
-
     /* New head */
     p_listFileData->p_head = p_newFileData;
 }
@@ -40,18 +39,25 @@ static void analyze_path(listFileData* p_listFileData, char* p_path)
     {
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
         {
-            //printf("%s\n", dp->d_name);
 
             /* If it's a file we add it in our files data structure */
             if (dp->d_type == 8)
             {
-                add_file(p_listFileData, dp->d_name, p_path);
+                char* p_fileName = malloc(sizeof(char) * (strlen(dp->d_name) + 1));
+                if (p_fileName == NULL)
+                {
+                    fprintf(stderr, "Error: malloc failed\n");
+                    exit(EXIT_FAILURE);
+                }
+                strcpy(p_fileName, dp->d_name);
+                //printf("%s%s\n", p_path, p_fileName);
+                add_file(p_listFileData, p_fileName, p_path);
             }
 
             // Construct new path from our base path
             strcpy(updatedPath, p_path);
-            strcat(updatedPath, "/");
             strcat(updatedPath, dp->d_name);
+            strcat(updatedPath, "/");
 
             analyze_path(p_listFileData, updatedPath);
         }
@@ -101,10 +107,11 @@ void free_path_data(listFileData* p_listFileData)
     while (p_currentFileData != NULL)
     {
         p_nextFileData = p_currentFileData->p_next;
-        free(p_currentFileData);
+        free(p_currentFileData->p_name); // free memory of file name
+        free(p_currentFileData); // free memory of file data struct
         p_currentFileData = p_nextFileData;
     }
-    free(p_listFileData);
+    free(p_listFileData); // free memory of listFileData struct
 
 }
 
@@ -113,7 +120,7 @@ void print_path_data(listFileData* p_listFileData)
     fileData* p_currentFileData = p_listFileData->p_head;
     while (p_currentFileData != NULL)
     {
-        printf("%s/%s\n", p_currentFileData->p_path, p_currentFileData->p_name);
+        printf("%s%s\n", p_currentFileData->p_path, p_currentFileData->p_name);
         p_currentFileData = p_currentFileData->p_next;
     }
 
