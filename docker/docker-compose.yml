@@ -1,4 +1,15 @@
 services:
+  server:
+    build: ../server
+    environment:
+      - NODE_ENV=production
+    ports:
+        - "5000:5000"
+    env_file:
+      - ../server/.env
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:latest
     environment:
