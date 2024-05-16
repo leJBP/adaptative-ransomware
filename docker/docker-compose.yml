@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: projet_crypto
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./:/docker-entrypoint-initdb.d
+      - postgres_crypto_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_crypto_data:
