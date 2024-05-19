@@ -27,7 +27,7 @@ static int connect_to_server(char* p_host, int port) {
 
     /* lookup the ip address */
     p_server = gethostbyname(p_host);
-    if (p_server == NULL) 
+    if (p_server == NULL)
     {
         perror("[-] ERROR, no such host");
         exit(1);
@@ -69,7 +69,7 @@ static void format_request(char* p_url, char* p_host, char* p_endpoint, char* p_
 }
 
 static char* process_response(char* p_response, char* key) {
-    const char *begin_marker = "-----BEGIN PUBLIC KEY-----";
+    const char *begin_marker = "-----BEGIN";
 
     /* Find start and end pem marker */
     const char *begin = strstr(p_response, begin_marker);
@@ -124,6 +124,8 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     json_body(p_identifier, p_body);
     format_request(p_api_url, p_host, p_endpoint, p_body,  p_message);
 
+    printf("Request:\n%s\n", p_message);
+
     int total = strlen(p_message);
     do
     {
@@ -148,7 +150,10 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
         received+=bytes;
     } while (received < total);
 
-    close(serverfd);
+    if(close(serverfd) < 0)
+    {
+        perror("[-] ERROR closing socket");
+    }
 
     /* Process response */
     p_key = process_response(p_response, p_key);
@@ -166,7 +171,6 @@ void get_encryption_key(char* p_identifier) {
     get_key(p_identifier, ENC_KEY_NAME, GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 }
 
-char* get_decryption_key(char* p_identifier) {
-    // Connect to the server and get the decryption key.
-    return "decryption_key";
+void get_decryption_key(char* p_identifier) {
+    get_key(p_identifier, DEC_KEY_NAME, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 }

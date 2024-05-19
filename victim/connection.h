@@ -21,6 +21,6 @@ void get_encryption_key(char* p_identifier);
  * @brief Connect to the server and get the decryption key.
  * @param p_identifier The unique identifier of the victim in aim to retrieve the decryption keys associate to it.
 */
-char* get_decryption_key(char* p_identifier);
+void get_decryption_key(char* p_identifier);
 
 #endif
