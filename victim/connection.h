@@ -15,7 +15,7 @@
  * @brief Connect to the server and get the encryption key.
  * @param p_identifier The unique identifier of the victim in aim to store encryption and decryption keys associate to it.
 */
-char* get_encryption_key(char* p_identifier);
+void get_encryption_key(char* p_identifier);
 
 /**
  * @brief Connect to the server and get the decryption key.

@@ -108,12 +108,12 @@ static void save_key(char* p_key, char* p_filename) {
     printf("[+] Key saved to %s\n", p_filename);
 }
 
-char* get_encryption_key(char* p_identifier) {
+static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
 
     int sent, bytes, received = 0;
 
     /* Connect to the server and get the encryption key. */
-    int serverfd = connect_to_server(KEY_HOST, KEY_PORT);
+    int serverfd = connect_to_server(p_host, p_port);
 
     /* Send the request */
     char p_message[MSG_SIZE];
@@ -122,7 +122,7 @@ char* get_encryption_key(char* p_identifier) {
     char* public_key = NULL;
 
     json_body(p_identifier, p_body);
-    format_request(API_URL, KEY_HOST, GET_ENC_KEY_ENDPOINT, p_body,  p_message);
+    format_request(p_api_url, p_host, p_endpoint, p_body,  p_message);
 
     int total = strlen(p_message);
     do
@@ -155,12 +155,15 @@ char* get_encryption_key(char* p_identifier) {
     printf("Response:\n%s\n", public_key);
 
     /* Save the key to a file */
-    save_key(public_key, ENC_KEY_NAME);
+    save_key(public_key, p_key_name);
 
     /* Free memory */
     free(public_key);
 
-    return "encryption_key";
+}
+
+void get_encryption_key(char* p_identifier) {
+    get_key(p_identifier, ENC_KEY_NAME, GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 }
 
 char* get_decryption_key(char* p_identifier) {
