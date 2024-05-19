@@ -79,7 +79,7 @@ static char* process_response(char* p_response, char* key) {
         /* Compute the length of the key */
         size_t key_length = strlen(begin);
         key = (char*)malloc(key_length + 1);
-        /* Copy the key to the public_key variable */
+        /* Copy the key */
         strncpy(key, begin, key_length);
         key[key_length] = '\0';  // End the string
         printf("[+] Public key found in response.\n");
@@ -119,7 +119,7 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     char p_message[MSG_SIZE];
     char p_response[RESPONSE_SIZE];
     char p_body[strlen(p_identifier) + 20];
-    char* public_key = NULL;
+    char* p_key = NULL;
 
     json_body(p_identifier, p_body);
     format_request(p_api_url, p_host, p_endpoint, p_body,  p_message);
@@ -151,14 +151,14 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     close(serverfd);
 
     /* Process response */
-    public_key = process_response(p_response, public_key);
-    printf("Response:\n%s\n", public_key);
+    p_key = process_response(p_response, p_key);
+    printf("Response:\n%s\n", p_key);
 
     /* Save the key to a file */
-    save_key(public_key, p_key_name);
+    save_key(p_key, p_key_name);
 
     /* Free memory */
-    free(public_key);
+    free(p_key);
 
 }
 

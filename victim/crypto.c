@@ -10,7 +10,7 @@ static void encrypt_file(fileData* p_fileData, RSA* p_pubKey)
     char* p_filePath = malloc(strlen(p_fileData->p_path) + strlen(p_fileData->p_name) + 2);
     if (p_filePath == NULL)
     {
-        perror("malloc");
+        perror("[-] malloc failed");
         exit(1);
     }
     sprintf(p_filePath, "%s/%s", p_fileData->p_path, p_fileData->p_name);
@@ -19,7 +19,7 @@ static void encrypt_file(fileData* p_fileData, RSA* p_pubKey)
     FILE* p_file = fopen(p_filePath, "r");
     if (p_file == NULL)
     {
-        perror("fopen");
+        perror("[-] fopen failed");
         exit(1);
     }
 
@@ -27,7 +27,7 @@ static void encrypt_file(fileData* p_fileData, RSA* p_pubKey)
     FILE* p_tempFile = tmpfile();
     if (p_tempFile == NULL)
     {
-        perror("tmpfile");
+        perror("[-] tmpfile failed");
         exit(1);
     }
 
@@ -38,7 +38,7 @@ static void encrypt_file(fileData* p_fileData, RSA* p_pubKey)
     while ((len = fread(inBuf, 1, sizeof(inBuf), p_file)) > 0) {
         int out_len = RSA_public_encrypt(len, inBuf, outBuf, p_pubKey, RSA_PKCS1_PADDING);
         if (out_len == -1) {
-            fprintf(stderr, "Erreur lors du chiffrement\n");
+            perror("[-] Erreur lors du chiffrement\n");
             fclose(p_file);
             fclose(p_tempFile);
             exit(2);
@@ -50,7 +50,7 @@ static void encrypt_file(fileData* p_fileData, RSA* p_pubKey)
     p_file = freopen(p_filePath, "w", p_file);
     if (p_file == NULL)
     {
-        perror("freopen");
+        perror("[-] freopen failed");
         exit(1);
     }
 
@@ -77,7 +77,7 @@ static void decrypt_file(fileData* p_fileData, RSA* p_privKey)
     char* p_filePath = malloc(strlen(p_fileData->p_path) + strlen(p_fileData->p_name) + 2);
     if (p_filePath == NULL)
     {
-        perror("malloc");
+        perror("[-] malloc failed");
         exit(1);
     }
     sprintf(p_filePath, "%s/%s", p_fileData->p_path, p_fileData->p_name);
@@ -86,7 +86,7 @@ static void decrypt_file(fileData* p_fileData, RSA* p_privKey)
     FILE* p_file = fopen(p_filePath, "rb");
     if (p_file == NULL)
     {
-        perror("fopen encrypted_file");
+        perror("[-] fopen encrypted_file failed");
         exit(1);
     }
 
@@ -94,7 +94,7 @@ static void decrypt_file(fileData* p_fileData, RSA* p_privKey)
     FILE* p_tempFile = tmpfile();
     if (p_tempFile == NULL)
     {
-        perror("tmpfile");
+        perror("[-] tmpfile failed");
         exit(1);
     }
 
@@ -105,7 +105,7 @@ static void decrypt_file(fileData* p_fileData, RSA* p_privKey)
     while ((len = fread(inBuf, 1, sizeof(inBuf), p_file)) > 0) {
         int decryptedLen = RSA_private_decrypt(len, inBuf, outBuf, p_privKey, RSA_PKCS1_PADDING);
         if (decryptedLen == -1) {
-            fprintf(stderr, "Erreur lors du déchiffrement\n");
+            perror("[-] Erreur lors du déchiffrement\n");
             fclose(p_file);
             fclose(p_tempFile);
             exit(2);
@@ -117,7 +117,7 @@ static void decrypt_file(fileData* p_fileData, RSA* p_privKey)
     p_file = freopen(p_filePath, "w", p_file);
     if (p_file == NULL)
     {
-        perror("freopen");
+        perror("[-] freopen failed");
         exit(1);
     }
 
