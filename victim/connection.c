@@ -47,16 +47,19 @@ static int connect_to_server(char* p_host, int port) {
         exit(1);
     }
 
-    printf("[+] Connected to %s:%d\n", p_host, port);
+    printf("\n[+] Connected to %s:%d\n", p_host, port);
 
     return sockfd;
 }
 
-static void json_body(char* p_identifier, char* p_body) {
+static char* json_body(char* p_identifier) {
+    char* p_body = (char*)malloc(strlen(p_identifier) + 1);
     sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
+    return p_body;
 }
 
-static void format_request(char* p_url, char* p_host, char* p_endpoint, char* p_body,  char* p_request) {
+static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p_body) {
+    char* p_request = (char*)malloc(strlen(p_url) + strlen(p_endpoint) + strlen(p_host) + strlen(p_body) + 100);
     sprintf(p_request, 
         "POST %s%s HTTP/1.0\r\n"
         "Host: %s\r\n"
@@ -66,9 +69,10 @@ static void format_request(char* p_url, char* p_host, char* p_endpoint, char* p_
         "%s",
         p_url, p_endpoint,
         p_host, strlen(p_body), p_body);
+    return p_request;
 }
 
-static char* process_response(char* p_response, char* key) {
+static char* process_response(char* p_response) {
     const char *begin_marker = "-----BEGIN";
 
     /* Find start and end pem marker */
@@ -78,16 +82,17 @@ static char* process_response(char* p_response, char* key) {
     if (begin) {
         /* Compute the length of the key */
         size_t key_length = strlen(begin);
-        key = (char*)malloc(key_length + 1);
+        char* key = (char*)malloc(key_length + 1);
         /* Copy the key */
         strncpy(key, begin, key_length);
         key[key_length] = '\0';  // End the string
         printf("[+] Public key found in response.\n");
+        //printf("Key:\n%s\n", key);
+        return key;
     } else {
         perror("[-] Public key markers not found in response.\n");
         exit(1);
     }
-    return key;
 }
 
 static void save_key(char* p_key, char* p_filename) {
@@ -114,17 +119,20 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
 
     /* Connect to the server and get the encryption key. */
     int serverfd = connect_to_server(p_host, p_port);
+    //printf("Serverfd: %d\n", serverfd);
 
     /* Send the request */
-    char p_message[MSG_SIZE];
-    char p_response[RESPONSE_SIZE];
-    char p_body[strlen(p_identifier) + 20];
+    char* p_message = NULL;
+    char* p_response = NULL;
+    char* p_body = NULL;
     char* p_key = NULL;
 
-    json_body(p_identifier, p_body);
-    format_request(p_api_url, p_host, p_endpoint, p_body,  p_message);
+    p_body = json_body(p_identifier);
+    p_message = format_request(p_api_url, p_host, p_endpoint, p_body);
 
-    printf("Request:\n%s\n", p_message);
+    //printf("Request:\n%s\n", p_message);
+
+    printf("[+] Sending request to server\n");
 
     int total = strlen(p_message);
     do
@@ -138,8 +146,14 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     } while (sent < total);
 
     /* Receive the response */
-    memset(p_response,0,sizeof(p_response));
-    total = sizeof(p_response) - 1;
+    p_response = (char*)malloc(RESPONSE_SIZE);
+    if (p_response == NULL)
+    {
+        perror("[-] malloc failed");
+        exit(1);
+    }
+
+    total = RESPONSE_SIZE;
     do
     {
         bytes = read(serverfd, p_response+received, total-received);
@@ -153,17 +167,25 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     if(close(serverfd) < 0)
     {
         perror("[-] ERROR closing socket");
+        exit(1);
     }
 
     /* Process response */
-    p_key = process_response(p_response, p_key);
-    printf("Response:\n%s\n", p_key);
+    p_key = process_response(p_response);
+    //printf("Response:\n%s\n", p_key);
 
     /* Save the key to a file */
     save_key(p_key, p_key_name);
 
     /* Free memory */
     free(p_key);
+    p_key = NULL;
+    free(p_message);
+    p_message = NULL;
+    free(p_body);
+    p_body = NULL;
+    free(p_response);
+    p_response = NULL;
 
 }
 
