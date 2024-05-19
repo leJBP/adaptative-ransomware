@@ -53,7 +53,8 @@ static int connect_to_server(char* p_host, int port) {
 }
 
 static char* json_body(char* p_identifier) {
-    char* p_body = (char*)malloc(strlen(p_identifier) + 1);
+    char* p_body = NULL;
+    p_body = (char*)malloc(strlen(p_identifier) + 21);
     sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
     return p_body;
 }
@@ -73,16 +74,17 @@ static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p
 }
 
 static char* process_response(char* p_response) {
+    size_t key_length = 0;
+    char* key = NULL;
     const char *begin_marker = "-----BEGIN";
 
     /* Find start and end pem marker */
-    const char *begin = strstr(p_response, begin_marker);
-    //printf("Response:\n%s\n",p_response);
+    const char* begin = strstr(p_response, begin_marker);
 
     if (begin) {
         /* Compute the length of the key */
-        size_t key_length = strlen(begin);
-        char* key = (char*)malloc(key_length + 1);
+        key_length = strlen(begin);
+        key = (char*)malloc(key_length + 1);
         /* Copy the key */
         strncpy(key, begin, key_length);
         key[key_length] = '\0';  // End the string
@@ -115,7 +117,10 @@ static void save_key(char* p_key, char* p_filename) {
 
 static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
 
-    int sent, bytes, received = 0;
+    int sent = 0;
+    int received = 0;
+    int bytes = 0;
+    int total = 0;
 
     /* Connect to the server and get the encryption key. */
     int serverfd = connect_to_server(p_host, p_port);
@@ -134,7 +139,7 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
 
     printf("[+] Sending request to server\n");
 
-    int total = strlen(p_message);
+     total = strlen(p_message);
     do
     {
         bytes = write(serverfd, p_message+sent, total-sent);
