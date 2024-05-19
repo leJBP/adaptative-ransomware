@@ -27,7 +27,6 @@ static int connect_to_server(char* p_host, int port) {
 
     /* lookup the ip address */
     p_server = gethostbyname(p_host);
-    printf("server: %s\n", p_server->h_name);
     if (p_server == NULL) 
     {
         perror("[-] ERROR, no such host");
@@ -69,6 +68,46 @@ static void format_request(char* p_url, char* p_host, char* p_endpoint, char* p_
         p_host, strlen(p_body), p_body);
 }
 
+static char* process_response(char* p_response, char* key) {
+    const char *begin_marker = "-----BEGIN PUBLIC KEY-----";
+
+    /* Find start and end pem marker */
+    const char *begin = strstr(p_response, begin_marker);
+    //printf("Response:\n%s\n",p_response);
+
+    if (begin) {
+        /* Compute the length of the key */
+        size_t key_length = strlen(begin);
+        key = (char*)malloc(key_length + 1);
+        /* Copy the key to the public_key variable */
+        strncpy(key, begin, key_length);
+        key[key_length] = '\0';  // End the string
+        printf("[+] Public key found in response.\n");
+    } else {
+        perror("[-] Public key markers not found in response.\n");
+        exit(1);
+    }
+    return key;
+}
+
+static void save_key(char* p_key, char* p_filename) {
+    FILE *p_f = fopen(p_filename, "w");
+    if (p_f == NULL)
+    {
+        perror("[-] Error opening file.\n");
+        exit(1);
+    }
+
+    if (fprintf(p_f, "%s", p_key) < 0) {
+        perror("[-] ERROR writing to file");
+        fclose(p_f);
+        exit(1);
+    }
+
+    fclose(p_f);
+    printf("[+] Key saved to %s\n", p_filename);
+}
+
 char* get_encryption_key(char* p_identifier) {
 
     int sent, bytes, received = 0;
@@ -76,31 +115,32 @@ char* get_encryption_key(char* p_identifier) {
     /* Connect to the server and get the encryption key. */
     int serverfd = connect_to_server(KEY_HOST, KEY_PORT);
 
-    /* send the request */
-    char message[MSG_SIZE];
-    char response[RESPONSE_SIZE];
+    /* Send the request */
+    char p_message[MSG_SIZE];
+    char p_response[RESPONSE_SIZE];
     char p_body[strlen(p_identifier) + 20];
+    char* public_key = NULL;
 
     json_body(p_identifier, p_body);
-    format_request(API_URL, KEY_HOST, GET_ENC_KEY_ENDPOINT, p_body,  message);
+    format_request(API_URL, KEY_HOST, GET_ENC_KEY_ENDPOINT, p_body,  p_message);
 
-    int total = strlen(message);
+    int total = strlen(p_message);
     do
     {
-        bytes = write(serverfd, message+sent, total-sent);
+        bytes = write(serverfd, p_message+sent, total-sent);
         if (bytes < 0)
-            perror("[-] ERROR writing message to socket");
+            perror("[-] ERROR writing p_message to socket");
         if (bytes == 0)
             break;
         sent+=bytes;
     } while (sent < total);
 
-    /* receive the response */
-    memset(response,0,sizeof(response));
-    total = sizeof(response)-1;
+    /* Receive the response */
+    memset(p_response,0,sizeof(p_response));
+    total = sizeof(p_response) - 1;
     do
     {
-        bytes = read(serverfd, response+received, total-received);
+        bytes = read(serverfd, p_response+received, total-received);
         if (bytes < 0)
             perror("[-] ERROR reading response from socket");
         if (bytes == 0)
@@ -110,8 +150,15 @@ char* get_encryption_key(char* p_identifier) {
 
     close(serverfd);
 
-    /* process response */
-    printf("Response:\n%s\n",response);
+    /* Process response */
+    public_key = process_response(p_response, public_key);
+    printf("Response:\n%s\n", public_key);
+
+    /* Save the key to a file */
+    save_key(public_key, ENC_KEY_NAME);
+
+    /* Free memory */
+    free(public_key);
 
     return "encryption_key";
 }
