@@ -1,6 +1,7 @@
 .vscode
 *.o
 ransomware
+test
 *.pem
 rsa_generator.py
 /.idea/
