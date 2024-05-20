@@ -146,8 +146,6 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
         exit(2);
     }
 
-    printf("[+] Encrypted data: %s\n", inBuf);
-
     /* Decrypt the file */
     if (!EVP_PKEY_decrypt(ctx, outBuf, &outLen, inBuf, inLen)) {
         perror("[-] Decryption failed\n");
@@ -161,8 +159,6 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
         perror("[-] fopen failed");
         exit(1);
     }
-
-    printf("[+] Decrypted data: %s\n", outBuf);
 
     /* Write the decrypted data to the file */
     if (fwrite(outBuf, 1, outLen, p_file) != outLen)
