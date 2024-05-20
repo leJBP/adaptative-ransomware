@@ -126,16 +126,7 @@ int main(int argc, char const *argv[])
     if (g_encryption)
     {
         /* Get RSA public key from a file */
-        FILE* p_pubKeyFile = fopen("public.pem", "r");
-        if (p_pubKeyFile == NULL)
-        {
-            perror("[-] Encryption key GET failed");
-            exit(1);
-        }
-        RSA* p_pubKey = PEM_read_RSAPublicKey(p_pubKeyFile, NULL, NULL, NULL);
-        //RSA_print_fp(stdout, p_pubKey, 0);
-
-        fclose(p_pubKeyFile);
+        EVP_PKEY* p_pubKey = load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
 
         printf("[+] Encryption key GET success\n");
 
@@ -144,22 +135,13 @@ int main(int argc, char const *argv[])
         encrypt_files(p_listFileData, p_pubKey);
         printf("[+] Files encrypted\n");
 
-        RSA_free(p_pubKey);
+        EVP_PKEY_free(p_pubKey);
     }
 
     if (g_decryption)
     {
         /* Get RSA private key from a file */
-        FILE* p_privKeyFile = fopen("private.pem", "r");
-        if (p_privKeyFile == NULL)
-        {
-            perror("[-] Decryption key GET failed");
-            exit(1);
-        }
-        RSA* p_privKey = PEM_read_RSAPrivateKey(p_privKeyFile, NULL, NULL, NULL);
-        //RSA_print_fp(stdout, p_privKey, 0);
-
-        fclose(p_privKeyFile);
+        EVP_PKEY* p_privKey = load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
 
         printf("[+] Encryption key GET success\n");
 
@@ -168,7 +150,7 @@ int main(int argc, char const *argv[])
         decrypt_files(p_listFileData, p_privKey);
         printf("[+] Files decrypted\n");
 
-        RSA_free(p_privKey);
+        EVP_PKEY_free(p_privKey);
     }
 
 

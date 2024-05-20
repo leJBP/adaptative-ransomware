@@ -25,6 +25,7 @@ source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomwar
 - [x] Encrypt RSA
 - [x] Decrypt RSA
 - [ ] Main file
+- [ ] Docker environment to test ransomware
 
 
 ##### Syntaxe pour le C
