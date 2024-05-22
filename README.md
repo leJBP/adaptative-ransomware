@@ -5,27 +5,34 @@ Ransomware based on elliptic curve
 ### Choix à faire
 
 - Langage utilisé
-    - Java (attaquant)
+    - Node.js (attaquant)
     - C (victime)
 - Génération des clés
-- Chiffrement utilisé (RSA)
+- Chiffrement utilisé (RSA, AES, Chacha20)
 - Façon de procéder
-- Stockage des clés
+- Stockage des clés (postgreSQL)
 - Conception du programme
 
 #### Victim side to do list
 
 source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomware/4594
 
+Priorité:
 - [x] Find files to encrypt
-- [ ] Dropper
 - [x] Retrieve key for encryption from attacker server
-- [ ] Daemon
 - [x] Retrieve key for decryption from attacker server
 - [x] Encrypt RSA
 - [x] Decrypt RSA
+- [ ] Encrypt AES-256
+- [ ] Decrypt AES-256
+- [ ] Encrypt Chacha20
+- [ ] Decrypt Chacha20
 - [ ] Main file
 - [ ] Docker environment to test ransomware
+
+Pas la priorité :
+- [ ] Daemon
+- [ ] Dropper
 
 
 ##### Syntaxe pour le C
