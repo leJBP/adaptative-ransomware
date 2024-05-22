@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#include "connection.h"
+#include "server.h"
 
 int main(int argc, char const *argv[])
 {

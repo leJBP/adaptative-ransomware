@@ -1,5 +1,5 @@
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#ifndef SERVER_H
+#define SERVER_H
 
 #define KEY_HOST "localhost"
 #define KEY_PORT 5000

@@ -9,7 +9,7 @@
 #include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
 #include <netdb.h> /* struct hostent, gethostbyname */
 
-#include "connection.h"
+#include "server.h"
 
 /* Connect to the server and return socket descriptor */
 static int connect_to_server(char* p_host, int port) {

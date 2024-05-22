@@ -6,10 +6,10 @@ LDFLAGS= -lssl -lcrypto
 # Règles (à compléter avec des variables automatiques)
 all: ransomware clean
 
-ransomware: files_finder.o crypto.o ransomware.o
+ransomware: files_finder.o crypto_rsa.o ransomware.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-test: connection.o test.o
+test: server.o test.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 makedepend:
@@ -24,6 +24,6 @@ clean:
 
 files_finder.o: files_finder.h
 ransomware.o: files_finder.h
-crypto.o: crypto.h files_finder.h
-connection.o: connection.h
-test.o: connection.h
+crypto_rsa.o: crypto_rsa.h files_finder.h
+server.o: server.h
+test.o: server.h
