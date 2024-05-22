@@ -5,7 +5,7 @@
 #include <openssl/core_dispatch.h>
 #include <openssl/bio.h>
 
-#include "crypto.h"
+#include "crypto_rsa.h"
 
 static unsigned char* get_file_content(char* p_filePath, size_t* p_inLen)
 {
@@ -179,7 +179,7 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
 
 }
 
-void encrypt_files(listFileData* p_listFileData, EVP_PKEY* p_pubKey)
+void rsa_encrypt_files(listFileData* p_listFileData, EVP_PKEY* p_pubKey)
 {
     /* Browse all files to encrypt them */
     fileData* p_currentFile = p_listFileData->p_head;
@@ -190,7 +190,7 @@ void encrypt_files(listFileData* p_listFileData, EVP_PKEY* p_pubKey)
     }
 }
 
-void decrypt_files(listFileData* p_listFileData, EVP_PKEY* p_privKey)
+void rsa_decrypt_files(listFileData* p_listFileData, EVP_PKEY* p_privKey)
 {
     /* Browse all files to decrypt them */
     fileData* p_currentFile = p_listFileData->p_head;
@@ -201,7 +201,7 @@ void decrypt_files(listFileData* p_listFileData, EVP_PKEY* p_privKey)
     }
 }
 
-EVP_PKEY* load_key(char* p_filename, int selection )
+EVP_PKEY* rsa_load_key(char* p_filename, int selection )
 {
     OSSL_DECODER_CTX *dctx;
     EVP_PKEY *pkey = NULL;
