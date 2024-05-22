@@ -1,6 +1,6 @@
 ## But
 
-Ransomware based on elliptic curve
+Automatic ransomware on encryption algorithm choice
 
 ### Choix à faire
 
@@ -12,6 +12,7 @@ Ransomware based on elliptic curve
 - Façon de procéder
 - Stockage des clés (postgreSQL)
 - Conception du programme
+- Faire benchmark chiffrement en fonction de la taille des données à chiffrer
 
 #### Victim side to do list
 
