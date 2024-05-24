@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "files_finder.h"
 
@@ -20,6 +22,28 @@ static void add_file(listFileData* p_listFileData, char* p_name, char* p_path)
     p_newFileData->p_next = p_listFileData->p_head; // Linking to the previous head
     /* New head */
     p_listFileData->p_head = p_newFileData;
+
+    /* Build file path to get stat */
+    struct stat fileStat;
+    char* p_filePath = malloc(strlen(p_name) + strlen(p_path) + 1);
+    snprintf(p_filePath, strlen(p_name) + strlen(p_path) + 1, "%s%s", p_path, p_name);
+
+    /* Get data about the file */
+    if (stat(p_filePath, &fileStat) == -1) 
+    {
+        perror("[-] get data file stat failed");
+        exit(1);
+    }
+
+    /* Check if the entry is a file */
+    if (S_ISREG(fileStat.st_mode)) 
+    {
+        /* Add size of the file */
+        p_listFileData->totalSize += fileStat.st_size;
+    }
+
+    free(p_filePath);
+
 }
 
 /* Inspired from https://codeforwin.org/c-programming/c-program-to-list-all-files-in-a-directory-recursively */
