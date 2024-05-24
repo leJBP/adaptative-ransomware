@@ -65,37 +65,23 @@ static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_struct
         /* Header json with identifier value */
         sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
 
-        printf("p_body: %s\n", p_body);
-
         /* Add the benchmark data */
         sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
         strcat(p_body, p_tmp);
 
-         printf("p_body: %s\n", p_body);
-
         sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
         strcat(p_body, p_tmp);
-
-         printf("p_body: %s\n", p_body);
 
         sprintf(p_tmp, "\"cpuMinFreq\": %f,\n\t", p_data->cpuMinFreq);
         strcat(p_body, p_tmp);
 
-         printf("p_body: %s\n", p_body);
-
         sprintf(p_tmp, "\"cpuMaxFreq\": %f,\n\t", p_data->cpuMaxFreq);
         strcat(p_body, p_tmp);
-
-         printf("p_body: %s\n", p_body);
 
         sprintf(p_tmp, "\"memorySize\": %d\n\t}\n", p_data->memorySize);
         strcat(p_body, p_tmp);
 
-         printf("p_body: %s\n", p_body);
-
         strcat(p_body, "}");
-
-         printf("p_body: %s\n", p_body);
 
         free(p_tmp);
     }
