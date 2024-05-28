@@ -1,59 +1,56 @@
 <mxfile host="65bd71144e">
     <diagram id="J4XuC1SZbNevRb4Ly1Nk" name="Page-1">
-        <mxGraphModel dx="567" dy="1723" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+        <mxGraphModel dx="1683" dy="1636" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="14" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="13" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="14" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="560" y="-210.00000000000023" as="targetPoint"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="2" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Début&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="480" y="-370" width="160" height="100" as="geometry"/>
                 </mxCell>
-                <mxCell id="8" value="Connexion&lt;br&gt;établie ?" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" parent="1" source="5" target="7" edge="1">
-                    <mxGeometry x="-0.625" y="70" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
+                <mxCell id="25" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Connexion à&lt;br&gt;l'attaquant&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="810" y="100" width="160" height="100" as="geometry"/>
+                <mxCell id="7" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Récupération clé&lt;br&gt;déchiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="740" y="-240" width="160" height="100" as="geometry"/>
                 </mxCell>
-                <mxCell id="10" value="Clé&lt;br&gt;récupéré ?" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" parent="1" source="7" target="9" edge="1">
-                    <mxGeometry x="-0.6" y="70" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
+                <mxCell id="29" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;" edge="1" parent="1" source="9" target="27">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Récupération clé&lt;br&gt;chiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="810" y="-60" width="160" height="100" as="geometry"/>
-                </mxCell>
-                <mxCell id="12" value="Rançon&lt;br&gt;payé ?" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" parent="1" source="9" target="11" edge="1">
-                    <mxGeometry x="-0.625" y="70" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="9" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Chiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="810" y="-210" width="160" height="100" as="geometry"/>
+                <mxCell id="9" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Récupération clé&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;chiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="-100" width="160" height="100" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Déchiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="810" y="-370" width="160" height="100" as="geometry"/>
+                    <mxGeometry x="740" y="-100" width="160" height="100" as="geometry"/>
                 </mxCell>
-                <mxCell id="16" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="13" target="15" edge="1">
+                <mxCell id="22" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Déchiffrement &lt;br&gt;des données&lt;/font&gt;" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="17" target="7">
+                    <mxGeometry y="30" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="17" target="21">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Récupérer malware via un dropper&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="480" y="-210" width="160" height="100" as="geometry"/>
-                </mxCell>
-                <mxCell id="19" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="15" target="17" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="15" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Déchiffrer malware&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="480" y="-60" width="160" height="100" as="geometry"/>
-                </mxCell>
-                <mxCell id="21" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="17" target="5" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="26" value="Chiffrement&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;des données" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=14;" vertex="1" connectable="0" parent="23">
+                    <mxGeometry x="-0.4178" relative="1" as="geometry">
+                        <mxPoint x="-13" y="-40" as="offset"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="17" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Éxecuter le&lt;br&gt;ransomware&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="480" y="100" width="160" height="100" as="geometry"/>
+                    <mxGeometry x="480" y="-240" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="21" target="9">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Envois du benchmark au serveur&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="-240" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Chiffrement&lt;br&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="425" y="-100" width="160" height="100" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
