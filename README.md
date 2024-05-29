@@ -24,7 +24,8 @@ Priorité:
 - [x] Retrieve key for decryption from attacker server
 - [x] Encrypt RSA
 - [x] Decrypt RSA
-- [ ] Benchmark
+- [x] Benchmark (local)
+- [ ] Benchmark (serveur)
 - [ ] Encrypt AES-256
 - [ ] Decrypt AES-256
 - [ ] Encrypt Chacha20
