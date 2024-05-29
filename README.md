@@ -31,7 +31,7 @@ Priorité:
 - [ ] Encrypt Chacha20
 - [ ] Decrypt Chacha20
 - [ ] Main file
-- [ ] Docker environment to test ransomware
+- [x] Docker environment to test ransomware
 
 Pas la priorité :
 - [ ] Daemon
