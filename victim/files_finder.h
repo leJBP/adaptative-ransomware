@@ -12,6 +12,7 @@ typedef struct fileData fileData;
 struct listFileData
 {
     fileData* p_head;
+    long long totalSize;
 };
 typedef struct listFileData listFileData;
 

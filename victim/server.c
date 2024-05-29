@@ -10,6 +10,7 @@
 #include <netdb.h> /* struct hostent, gethostbyname */
 
 #include "server.h"
+#include "benchmark.h"
 
 /* Connect to the server and return socket descriptor */
 static int connect_to_server(char* p_host, int port) {
@@ -52,10 +53,39 @@ static int connect_to_server(char* p_host, int port) {
     return sockfd;
 }
 
-static char* json_body(char* p_identifier) {
+static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_structKey) {
     char* p_body = NULL;
-    p_body = (char*)malloc(strlen(p_identifier) + 21);
-    sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
+    p_body = (char*)malloc(250);
+    if (p_data == NULL)
+    {
+        sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
+    } else {
+
+        char* p_tmp = (char*)malloc(250);
+        /* Header json with identifier value */
+        sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
+
+        /* Add the benchmark data */
+        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuMinFreq\": %f,\n\t", p_data->cpuMinFreq);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"cpuMaxFreq\": %f,\n\t", p_data->cpuMaxFreq);
+        strcat(p_body, p_tmp);
+
+        sprintf(p_tmp, "\"memorySize\": %d\n\t}\n", p_data->memorySize);
+        strcat(p_body, p_tmp);
+
+        strcat(p_body, "}");
+
+        free(p_tmp);
+    }
+
     return p_body;
 }
 
@@ -132,7 +162,7 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     char* p_body = NULL;
     char* p_key = NULL;
 
-    p_body = json_body(p_identifier);
+    p_body = json_body(p_identifier, NULL, NULL);
     p_message = format_request(p_api_url, p_host, p_endpoint, p_body);
 
     //printf("Request:\n%s\n", p_message);
