@@ -26,8 +26,8 @@ Priorité:
 - [x] Decrypt RSA
 - [x] Benchmark (local)
 - [ ] Benchmark (serveur)
-- [ ] Encrypt AES-256
-- [ ] Decrypt AES-256
+- [x] Encrypt AES-256
+- [x] Decrypt AES-256
 - [ ] Encrypt Chacha20
 - [ ] Decrypt Chacha20
 - [ ] Main file
