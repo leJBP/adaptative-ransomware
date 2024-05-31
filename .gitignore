@@ -4,5 +4,6 @@ ransomware
 test
 *.pem
 rsa_generator.py
+cle.py
 /.idea/
 /server/node_modules/
