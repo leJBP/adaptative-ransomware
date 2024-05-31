@@ -17,11 +17,11 @@ static unsigned char* get_file_content(char* p_filePath, size_t* p_inLen)
     /* Compute the size of the file */
     fseek(p_file, 0, SEEK_END);
     size_t inLen = ftell(p_file);
-    *p_inLen = inLen;
+    *p_inLen = inLen + 1;
     fseek(p_file, 0, SEEK_SET);
 
     /* Allocate memory for buffers */
-    unsigned char* inBuf = malloc(sizeof(unsigned char) * (inLen + 1));
+    unsigned char* inBuf = malloc(sizeof(unsigned char) * inLen);
     if (inBuf == NULL)
     {
         perror("[-] malloc failed");
@@ -56,9 +56,11 @@ static void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
     /* Buffers environment */
     size_t inLen = 0;
     unsigned char* inBuf = get_file_content(p_filePath, &inLen);
-    inLen += AES_BLOCK_SIZE;
-    unsigned char* outBuf = malloc(sizeof(unsigned char*) * (inLen + AES_BLOCK_SIZE));
+    int cipherInLen = inLen + AES_BLOCK_SIZE;
+    int finalLen = 0;
     int outLen = 0;
+
+    unsigned char* outBuf = malloc(sizeof(unsigned char*) * cipherInLen);
 
     /* Encryption environment initialisation */
     if(!EVP_EncryptInit_ex(p_key, NULL, NULL, NULL, NULL))
@@ -67,19 +69,32 @@ static void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
         exit(1);
     }
 
+    printf("[+] Encrypting file: %s\n", inBuf);
+    printf("[+] File size: %ld\n", inLen);
+
+
     /* Encrypt data blocks */
-    if(!EVP_EncryptUpdate(p_key, outBuf, &outLen, inBuf, inLen))
+    if(!EVP_EncryptUpdate(p_key, outBuf, &cipherInLen, inBuf, inLen))
     {
         perror("[-] EVP_EncryptUpdate failed");
         exit(1);
     }
 
+    printf("[+] Encrypted data: %s\n", outBuf);
+    printf("[+] Encrypted data size: %d\n", cipherInLen);
+
+
     /* update ciphertext with the final remaining bytes */
-    if(!EVP_EncryptFinal_ex(p_key, outBuf+inLen, &outLen))
+    if(!EVP_EncryptFinal_ex(p_key, outBuf+cipherInLen, &finalLen))
     {
         perror("[-] EVP_EncryptFinal_ex failed");
         exit(1);
     }
+
+    outLen = cipherInLen + finalLen;
+
+    printf("[+] Encrypted data: %s\n", outBuf);
+    printf("[+] Encrypted data size: %d\n", outLen);
  
     /* Open the file in write mode */
     FILE* p_file = fopen(p_filePath, "wb");
@@ -121,9 +136,11 @@ static void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
     /* Buffers environment */
     size_t inLen = 0;
     unsigned char* inBuf = get_file_content(p_filePath, &inLen);
-    inLen += AES_BLOCK_SIZE + 1;
-    unsigned char* outBuf = malloc(sizeof(unsigned char*) * (inLen + AES_BLOCK_SIZE));
+    int plainLen = inLen;
+    int finalLen = 0;
     int outLen = 0;
+
+    unsigned char* outBuf = malloc(sizeof(unsigned char*) * inLen);
 
     /* Encryption environment initialisation */
     if (!EVP_DecryptInit_ex(p_key, NULL, NULL, NULL, NULL))
@@ -132,21 +149,30 @@ static void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
         exit(1);
     }
 
+    printf("[+] Decrypting file: %s\n", inBuf);
+    printf("[+] File size: %ld\n", inLen);
+
     /* Encrypt data */
-    if(!EVP_DecryptUpdate(p_key, outBuf, &outLen, inBuf, inLen))
+    if(!EVP_DecryptUpdate(p_key, outBuf, &plainLen, inBuf, inLen))
     {
         perror("[-] EVP_DecryptUpdate failed");
         exit(1);
     }
 
+    printf("[+] Decrypted data: %s\n", outBuf);
+    printf("[+] Decrypted data size: %d\n", plainLen);
+
     /* update ciphertext with the final remaining bytes */
-    if(EVP_DecryptFinal_ex(p_key, outBuf+inLen, &outLen))
+    if(EVP_DecryptFinal_ex(p_key, outBuf+plainLen, &finalLen))
     {
         perror("[-] EVP_DecryptFinal_ex failed");
         exit(1);
     }
 
-    outLen = strlen((char*)outBuf);
+    outLen = plainLen + finalLen;
+
+    printf("[+] Decrypted data: %s\n", outBuf);
+    printf("[+] Decrypted data size: %d\n", outLen);
  
     /* Open the file in write mode */
     FILE* p_file = fopen(p_filePath, "wb");
