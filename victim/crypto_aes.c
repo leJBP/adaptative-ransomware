@@ -67,6 +67,7 @@ static void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
         exit(1);
     }
 
+    /* Encrypt data blocks */
     if(!EVP_EncryptUpdate(p_key, outBuf, &outLen, inBuf, inLen))
     {
         perror("[-] EVP_EncryptUpdate failed");
@@ -131,6 +132,7 @@ static void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key)
         exit(1);
     }
 
+    /* Encrypt data */
     if(!EVP_DecryptUpdate(p_key, outBuf, &outLen, inBuf, inLen))
     {
         perror("[-] EVP_DecryptUpdate failed");
