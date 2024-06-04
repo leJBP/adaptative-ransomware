@@ -30,21 +30,16 @@ const REFERENCE_WEIGHTS = {
 const takeDecision = async (identifier, benchmark) => {
     // Comparer le benchmark avec les valeurs de référence
     const score = compareBenchmark(benchmark);
-    console.log('score', score);
     if(score >= 75) {
-        console.log('generateRSA4096Key');
         return await keyService.generateRSA4096KeyPair(identifier);
     }
     else if (score >= 50) {
-        console.log('generateRSA2048Key');
         return await keyService.generateRSA2048KeyPair(identifier);
     }
     else if(score >= 25) {
-        console.log('generateCHACHA20Key');
         return await keyService.generateAESKey(identifier);
     }
     else if(score < 25) {
-        console.log('generateAESKey');
         return await keyService.generateAESKey(identifier);
     }
 }
@@ -67,7 +62,6 @@ const compareBenchmark = (benchmark) => {
     for (const score of Object.values(scores)) {
         totalScore += score;
     }
-    console.log('totalScore', totalScore);
 
     // Normaliser le score total pour qu'il soit entre 0 et 100
     totalScore = totalScore * 100; // Ajustez cette multiplication pour obtenir une échelle de 0 à 100 selon les besoins
