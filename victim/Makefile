@@ -1,7 +1,7 @@
 # Définition des Variables (à compléter)
 CC=gcc
 CFLAGS=-Wall -pedantic -g
-LDFLAGS= -lssl -lcrypto -fopenmp
+LDFLAGS= -lssl -lcrypto
 
 # Règles (à compléter avec des variables automatiques)
 all: ransomware clean
@@ -9,7 +9,7 @@ all: ransomware clean
 ransomware: files_finder.o crypto_rsa.o ransomware.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-test: files_finder.o crypto_aes.o test.o
+test: files_finder.o crypto_rsa.o test.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 makedepend:
@@ -27,5 +27,5 @@ ransomware.o: files_finder.h
 crypto_rsa.o: crypto_rsa.h files_finder.h
 crypto_aes.o: crypto_aes.h files_finder.h
 server.o: server.h
-test.o: files_finder.h crypto_aes.h
+test.o: files_finder.h crypto_rsa.h
 benchmark.o: benchmark.h

