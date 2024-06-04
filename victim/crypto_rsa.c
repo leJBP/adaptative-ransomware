@@ -68,9 +68,6 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
     int nbBlocks = inLen / (keySize - PADDING_SIZE);
     int rest = inLen % (keySize - PADDING_SIZE);
 
-    printf("nbBlocks: %d\n", nbBlocks);
-    printf("rest: %d\n", rest);
-
     /* Encryption environment initialisation */
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(p_pubKey, NULL);
     EVP_PKEY_encrypt_init(ctx);
@@ -82,7 +79,6 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
     //}
 
     outLen = (nbBlocks + (rest > 0)) * keySize;
-    printf("outLen: %ld\n", outLen);
 
     outBuf = OPENSSL_zalloc(outLen);
     if(outBuf == NULL)
@@ -99,7 +95,6 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
             perror("[-] Encryption failed\n");
             exit(2);
         }
-        printf("i: %d\n", i);
     }
 
     /* Encrypt the last block if rest no null */
@@ -109,7 +104,6 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
             perror("[-] Encryption failed\n");
             exit(2);
         }
-        printf("Last block\n");
     }
 
     /* Open the file in write mode */
@@ -155,14 +149,15 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
     size_t inLen = 0;
     unsigned char* inBuf = get_file_content(p_filePath, &inLen);
     unsigned char* outBuf = NULL;
+    size_t outAlloc = 0;
     size_t outLen = 0;
+    size_t inBlockSize = 0;
 
     size_t keySize = EVP_PKEY_size(p_privKey);
+    inBlockSize = keySize;
 
     /* Split cipher text in block to decrypt it */
     int nbBlocks = inLen / keySize;
-
-    printf("nbBlocks: %d\n", nbBlocks);
 
     /* Encryption environment initialisation */
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(p_privKey, NULL);
@@ -174,11 +169,9 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
     //    exit(2);
     //}
 
-    outLen = nbBlocks * (keySize - PADDING_SIZE);
+    outAlloc = nbBlocks * (keySize - PADDING_SIZE);
 
-    printf("outLen: %ld\n", outLen);
-
-    outBuf = OPENSSL_zalloc(outLen);
+    outBuf = OPENSSL_zalloc(outAlloc);
     if(outBuf == NULL)
     {
         perror("[-] OPENSSL_zalloc failed\n");
@@ -188,9 +181,14 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
     /* Decrypt each block and put decrypted data in outBuf */
     for (int i = 0; i < nbBlocks; i++)
     {
-        int ret = EVP_PKEY_decrypt(ctx, outBuf + i * (keySize - PADDING_SIZE), &keySize, inBuf + i * keySize, keySize);
-        printf("ret: %d\n", ret);
-
+        keySize = inBlockSize;
+        if(!EVP_PKEY_decrypt(ctx, outBuf + i * (inBlockSize - PADDING_SIZE), &keySize, inBuf + i * inBlockSize, inBlockSize))
+        {
+            perror("[-] Decryption failed\n");
+            exit(2);
+        }
+        outLen += keySize;
+        //printf("i: %ld\n", keySize);
     }
 
     /* Open the file in write mode */
