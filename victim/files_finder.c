@@ -145,6 +145,8 @@ void free_path_data(listFileData* p_listFileData)
     }
     free(p_listFileData); // free memory of listFileData struct
 
+    printf("[+] Memory freed\n");
+
 }
 
 void print_path_data(listFileData* p_listFileData)
