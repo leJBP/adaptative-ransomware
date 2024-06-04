@@ -5,14 +5,17 @@ const SymetricKey = require('../models/symetricKeys');
 /** Clés Symétriques **/
 // Génère une clé symétrique AES-256 aléatoire
 const generateAESKey = async (identifier) => {
-    const key = crypto.randomBytes(32).toString('hex'); // Génère une clé AES-256 aléatoire
-
+    const key = crypto.randomBytes(32).toString('base64'); // Génère une clé AES-256 aléatoire
     const keys = await SymetricKey.findOne({where: {identifier}});
 
     if (keys) {
         return {key: key};
     }
+
+
     await SymetricKey.create({identifier, key});
+
+
 
     return {key};
 }
@@ -26,7 +29,7 @@ const getAESKey = async (identifier) => {
 // Génère une clé symétrique CHACHA20
 const generateCHACHA20Key = async (identifier) => {
 
-    const key = crypto.randomBytes(32).toString('hex'); // Génère une clé CHACHA20 aléatoire
+    const key = crypto.randomBytes(32); // Génère une clé CHACHA20 aléatoire
 
     const keys = await SymetricKey.findOne({where: {identifier}});
 
@@ -65,6 +68,12 @@ const generateRSA4096KeyPair = async (identifier) => {
     return { publicKey };
 };
 
+// Récupère la clé publique RSA-4096 associée à un identifiant
+const getRSA4096PublicKey = async (identifier) => {
+    const key = await AsymetricKey.findOne({ where: { identifier } });
+    return key ? key.publicKey : null;
+};
+
 // Récupère la clé privée RSA-4096 associée à un identifiant
 const getRSA4096PrivateKey = async (identifier) => {
     const key = await AsymetricKey.findOne({ where: { identifier } });
@@ -88,6 +97,12 @@ const generateRSA2048KeyPair = async (identifier) => {
     await AsymetricKey.create({ identifier, publicKey, privateKey });
 
     return { publicKey };
+};
+
+// Récupère la clé publique RSA-2048 associée à un identifiant
+const getRSA2048PublicKey = async (identifier) => {
+    const key = await AsymetricKey.findOne({ where: { identifier } });
+    return key ? key.publicKey : null;
 };
 
 // Récupère la clé privée RSA-2048 associée à un identifiant

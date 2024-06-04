@@ -5,3 +5,4 @@ ransomware
 rsa_generator.py
 /.idea/
 /server/node_modules/
+/server_old/
