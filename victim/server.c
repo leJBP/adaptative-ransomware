@@ -69,7 +69,7 @@ static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_struct
         sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
         strcat(p_body, p_tmp);
 
-        sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
+        sprintf(p_tmp, "\"cpuCores\": %d,\n\t", p_data->cpuCore);
         strcat(p_body, p_tmp);
 
         sprintf(p_tmp, "\"cpuMinFreq\": %d,\n\t", p_data->cpuMinFreq);
@@ -127,7 +127,7 @@ static char* process_response(char* p_response) {
     }
 }
 
-static void save_key(char* p_key, char* p_filename) {
+void save_key(char* p_key, char* p_filename) {
     FILE *p_f = fopen(p_filename, "w");
     if (p_f == NULL)
     {
@@ -145,7 +145,7 @@ static void save_key(char* p_key, char* p_filename) {
     printf("[+] Key saved to %s\n", p_filename);
 }
 
-static void contact_server(char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_key_name, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
+static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
 
     int sent = 0;
     int received = 0;
@@ -205,14 +205,15 @@ static void contact_server(char* p_identifier, benchmarkData* p_data, char* p_st
         exit(1);
     }
 
-    printf("%s\n", p_response);
-
     /* Process response */
     //p_key = process_response(p_response);
     //printf("Response:\n%s\n", p_key);
 
     /* Save the key to a file */
-    //save_key(p_key, p_key_name);
+    //if (p_key_name != NULL)
+    //{
+    //    save_key(p_key, p_key_name);
+    //}
 
     /* Free memory */
     //free(p_key);
@@ -221,20 +222,14 @@ static void contact_server(char* p_identifier, benchmarkData* p_data, char* p_st
     p_message = NULL;
     free(p_body);
     p_body = NULL;
-    free(p_response);
-    p_response = NULL;
- 
+
+    return p_response; 
 }
 
-void get_encryption_key(char* p_identifier) {
-    contact_server(p_identifier, NULL, NULL, ENC_RSA_KEY_NAME, GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+char* get_encryption_key(char* p_identifier, benchmarkData* p_data) {
+    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 }
 
-void get_decryption_key(char* p_identifier) {
-    contact_server(p_identifier, NULL, NULL, DEC_RSA_KEY_NAME, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
-}
-
-void post_benchmark(char* p_identifier, benchmarkData* p_data)
-{
-    contact_server(p_identifier, p_data, "benchmark", NULL, GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+char* get_decryption_key(char* p_identifier) {
+    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 }

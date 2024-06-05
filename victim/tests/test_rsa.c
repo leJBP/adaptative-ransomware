@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
 
     /* Envoi du benchmark au serveur */
     benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
-    post_benchmark("jsp", p_benchmarkData);
+    char* p_key = get_encryption_key("jsp", p_benchmarkData);
 
     /* Chargement public key */
     EVP_PKEY* p_pubKey = rsa_load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
