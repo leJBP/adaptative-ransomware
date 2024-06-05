@@ -10,6 +10,7 @@ router.post('/generate', benchmarkService.validateBenchmark, async (req, res) =>
     if(!identifier) return res.status(400).send('Identifier is required');
     if(!benchmark) return res.status(400).send('Benchmark is required');
     try {
+        if(await keyService.findKey(identifier)) return res.status(400).send('Key already exists');
         const {encryptKey, algorithm} = await benchmarkService.takeDecision(identifier, benchmark);
         res.send({encryptKey, algorithm});
     }
@@ -20,8 +21,8 @@ router.post('/generate', benchmarkService.validateBenchmark, async (req, res) =>
 
 router.post('/decrypt', async (req, res) => {
     const {identifier} = req.body;
-    const decryptKey = await keyService.getDecryptKey(identifier);
-    res.send(decryptKey);
+    const {decryptKey, algorithm} = await keyService.getDecryptKey(identifier);
+    res.send({decryptKey, algorithm});
 });
 
 module.exports = router;

@@ -11,6 +11,10 @@ const SymetricKeys = sequelize.define('Keys', {
     key: {
         type: DataTypes.TEXT,
         allowNull: true,
+    },
+    algorithm: {
+        type: DataTypes.STRING,
+        allowNull: false,
     }
 }, {
     tableName: 'symetricKeys',

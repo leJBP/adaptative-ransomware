@@ -10,11 +10,15 @@ const AsymetricKeys = sequelize.define('Keys', {
     },
     publicKey: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
     },
     privateKey: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
+    },
+    algorithm: {
+        type: DataTypes.STRING,
+        allowNull: false,
     }
 }, {
     tableName: 'asymetricKeys',

@@ -44,7 +44,7 @@ const takeDecision = async (identifier, benchmark) => {
     }
     else if(score < 25) {
         const key = await keyService.generateAESKey(identifier);
-        return {encryptKey: key, algorithm: 'AES'};
+        return {encryptKey: key, algorithm: 'AES-256'};
     }
 }
 
