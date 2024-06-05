@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const Keys = sequelize.define('Keys', {
+const AsymetricKeys = sequelize.define('Keys', {
     identifier: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -10,16 +10,16 @@ const Keys = sequelize.define('Keys', {
     },
     publicKey: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     privateKey: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     }
 }, {
-    tableName: 'keys',
+    tableName: 'asymetricKeys',
         timestamps: false,
 });
 
 
-module.exports = Keys;
+module.exports = AsymetricKeys;
