@@ -10,8 +10,8 @@ router.post('/generate', benchmarkService.validateBenchmark, async (req, res) =>
     if(!identifier) return res.status(400).send('Identifier is required');
     if(!benchmark) return res.status(400).send('Benchmark is required');
     try {
-        const encryptKey = await benchmarkService.takeDecision(identifier, benchmark);
-        res.send(encryptKey);
+        const {encryptKey, algorithm} = await benchmarkService.takeDecision(identifier, benchmark);
+        res.send({encryptKey, algorithm});
     }
     catch (err) {
         res.status(400).send(err.message);

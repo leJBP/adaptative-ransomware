@@ -9,13 +9,10 @@ const generateAESKey = async (identifier) => {
     const keys = await SymetricKey.findOne({where: {identifier}});
 
     if (keys) {
-        return {key: key};
+        return {key: keys.key};
     }
 
-
     await SymetricKey.create({identifier, key});
-
-
 
     return {key};
 }
@@ -28,14 +25,15 @@ const getAESKey = async (identifier) => {
 
 // Génère une clé symétrique CHACHA20
 const generateCHACHA20Key = async (identifier) => {
-
-    const key = crypto.randomBytes(32); // Génère une clé CHACHA20 aléatoire
-
     const keys = await SymetricKey.findOne({where: {identifier}});
 
     if (keys) {
-        return {key: key};
+        return {key: keys.key};
     }
+
+    const key = crypto.randomBytes(32).toString('base64'); // Génère une clé CHACHA20 aléatoire
+
+
     await SymetricKey.create({identifier, key});
 
     return {key};
@@ -50,6 +48,12 @@ const getCHACHA20Key = async (identifier) => {
 /** Clés Asymétriques **/
 // Génère une paire de clés RSA-4096
 const generateRSA4096KeyPair = async (identifier) => {
+    const keys = await AsymetricKey.findOne({ where: { identifier } });
+
+    if(keys)
+    {
+        return { publicKey: keys.publicKey };
+    }
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 4096,
@@ -57,12 +61,7 @@ const generateRSA4096KeyPair = async (identifier) => {
         privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
 
-    const keys = await AsymetricKey.findOne({ where: { identifier } });
 
-    if(keys)
-    {
-        return { publicKey: keys.publicKey, privateKey: keys.privateKey };
-    }
     await AsymetricKey.create({ identifier, publicKey, privateKey });
 
     return { publicKey };
@@ -82,18 +81,19 @@ const getRSA4096PrivateKey = async (identifier) => {
 
 // Génère une paire de clés RSA-2048
 const generateRSA2048KeyPair = async (identifier) => {
+    const keys = await AsymetricKey.findOne({ where: { identifier } });
+
+    if(keys)
+    {
+        return { publicKey: keys.publicKey };
+    }
+
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
         publicKeyEncoding: { type: 'spki', format: 'pem' },
         privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
 
-    const keys = await AsymetricKey.findOne({ where: { identifier } });
-
-    if(keys)
-    {
-        return { publicKey: keys.publicKey, privateKey: keys.privateKey };
-    }
     await AsymetricKey.create({ identifier, publicKey, privateKey });
 
     return { publicKey };

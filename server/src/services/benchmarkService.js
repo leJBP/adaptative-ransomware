@@ -9,13 +9,13 @@ validateBenchmark = [
     body('dataSize').notEmpty().isNumeric().trim().escape()
 ]
 
-// Valeurs de références pour le benchmark en octets
+// Valeurs de références pour le benchmark en octets et en MHz
 const REFERENCE_VALUES = {
-    cpuMaxFreq: 3000000000,
-    cpuMinFreq: 1000000000,
+    cpuMaxFreq: 5000, // MHz
+    cpuMinFreq: 1000, // MHz
     cpuCores: 4,
-    memorySize: 8589934592,
-    dataSize: 1000000
+    memorySize: 16 * 1024 * 1024 * 1024, // 16 Go
+    dataSize: 1024 * 1024 * 1024 // 1 Go
 }
 
 // Pondération des valeurs de références
@@ -31,16 +31,20 @@ const takeDecision = async (identifier, benchmark) => {
     // Comparer le benchmark avec les valeurs de référence
     const score = compareBenchmark(benchmark);
     if(score >= 75) {
-        return await keyService.generateRSA4096KeyPair(identifier);
+        const key = await keyService.generateRSA4096KeyPair(identifier);
+        return {encryptKey: key.publicKey, algorithm: 'RSA-4096'};
     }
     else if (score >= 50) {
-        return await keyService.generateRSA2048KeyPair(identifier);
+        const key = await keyService.generateRSA2048KeyPair(identifier);
+        return {encryptKey: key.publicKey, algorithm: 'RSA-2048'};
     }
     else if(score >= 25) {
-        return await keyService.generateAESKey(identifier);
+        const key = await keyService.generateCHACHA20Key(identifier);
+        return {encryptKey: key, algorithm: 'CHACHA20'};
     }
     else if(score < 25) {
-        return await keyService.generateAESKey(identifier);
+        const key = await keyService.generateAESKey(identifier);
+        return {encryptKey: key, algorithm: 'AES'};
     }
 }
 
