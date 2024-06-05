@@ -1,9 +1,9 @@
 .vscode
 *.o
 ransomware
-test
+test_rsa
+test.txt
 *.pem
-rsa_generator.py
 cle.py
 /.idea/
 /server/node_modules/

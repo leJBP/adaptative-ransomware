@@ -4,8 +4,8 @@
 #include <string.h>
 #include <openssl/evp.h>
 
-#include "crypto_rsa.h"
-#include "files_finder.h"
+#include "../crypto_rsa.h"
+#include "../files_finder.h"
 
 int main(int argc, char const *argv[])
 {
