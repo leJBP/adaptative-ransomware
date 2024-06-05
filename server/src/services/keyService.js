@@ -9,13 +9,10 @@ const generateAESKey = async (identifier) => {
     const keys = await SymetricKey.findOne({where: {identifier}});
 
     if (keys) {
-        return {key: key};
+        return {key: keys.key};
     }
 
-
-    await SymetricKey.create({identifier, key});
-
-
+    await SymetricKey.create({identifier, key, algorithm:"AES-256"});
 
     return {key};
 }
@@ -28,15 +25,16 @@ const getAESKey = async (identifier) => {
 
 // Génère une clé symétrique CHACHA20
 const generateCHACHA20Key = async (identifier) => {
-
-    const key = crypto.randomBytes(32); // Génère une clé CHACHA20 aléatoire
-
     const keys = await SymetricKey.findOne({where: {identifier}});
 
     if (keys) {
-        return {key: key};
+        return {key: keys.key};
     }
-    await SymetricKey.create({identifier, key});
+
+    const key = crypto.randomBytes(32).toString('base64'); // Génère une clé CHACHA20 aléatoire
+
+
+    await SymetricKey.create({identifier, key, algorithm:"CHACHA20"});
 
     return {key};
 }
@@ -50,6 +48,12 @@ const getCHACHA20Key = async (identifier) => {
 /** Clés Asymétriques **/
 // Génère une paire de clés RSA-4096
 const generateRSA4096KeyPair = async (identifier) => {
+    const keys = await AsymetricKey.findOne({ where: { identifier } });
+
+    if(keys)
+    {
+        return { publicKey: keys.publicKey };
+    }
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 4096,
@@ -57,13 +61,8 @@ const generateRSA4096KeyPair = async (identifier) => {
         privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
 
-    const keys = await AsymetricKey.findOne({ where: { identifier } });
 
-    if(keys)
-    {
-        return { publicKey: keys.publicKey, privateKey: keys.privateKey };
-    }
-    await AsymetricKey.create({ identifier, publicKey, privateKey });
+    await AsymetricKey.create({ identifier, publicKey, privateKey, algorithm:"RSA-4096" });
 
     return { publicKey };
 };
@@ -82,19 +81,20 @@ const getRSA4096PrivateKey = async (identifier) => {
 
 // Génère une paire de clés RSA-2048
 const generateRSA2048KeyPair = async (identifier) => {
+    const keys = await AsymetricKey.findOne({ where: { identifier } });
+
+    if(keys)
+    {
+        return { publicKey: keys.publicKey };
+    }
+
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
         publicKeyEncoding: { type: 'spki', format: 'pem' },
         privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
 
-    const keys = await AsymetricKey.findOne({ where: { identifier } });
-
-    if(keys)
-    {
-        return { publicKey: keys.publicKey, privateKey: keys.privateKey };
-    }
-    await AsymetricKey.create({ identifier, publicKey, privateKey });
+    await AsymetricKey.create({ identifier, publicKey, privateKey, algorithm:"RSA-2048" });
 
     return { publicKey };
 };
@@ -117,7 +117,7 @@ const findKey = async (identifier) => {
     const symetricKeys = await SymetricKey.findOne({ where: { identifier } });
     const asymetricKeys = await AsymetricKey.findOne({ where: { identifier } });
 
-    return symetricKeys || asymetricKeys;
+    return symetricKeys || asymetricKeys || null ;
 }
 
 // Renvoie la clé de déchiffrement associée à un identifiant
@@ -125,11 +125,11 @@ const getDecryptKey = async (identifier) => {
     const key = await findKey(identifier);
     // Si la clé est symétrique, on la renvoie
     if (key && key.key) {
-        return key.key;
+        return { decryptKey: key.key, algorithm: key.algorithm };
     }
     // Si la clé est asymétrique, on renvoie la clé privée
     if (key && key.privateKey) {
-        return key.privateKey;
+        return { decryptKey: key.privateKey, algorithm: key.algorithm };
     }
     return null;
 }
@@ -140,5 +140,6 @@ module.exports = {
     generateCHACHA20Key,
     generateRSA4096KeyPair,
     generateRSA2048KeyPair,
-    getDecryptKey
+    getDecryptKey,
+    findKey
 };
