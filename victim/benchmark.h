@@ -5,8 +5,8 @@ struct benchmarkData
 {
     int dataSize;
     int cpuCore;
-    float cpuMinFreq;
-    float cpuMaxFreq;
+    int cpuMinFreq;
+    int cpuMaxFreq;
     int memorySize;
 };
 typedef struct benchmarkData benchmarkData;

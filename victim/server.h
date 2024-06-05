@@ -8,8 +8,8 @@
 #define GET_DEC_KEY_ENDPOINT "decrypt"
 #define MSG_SIZE 1024
 #define RESPONSE_SIZE 4096
-#define ENC_KEY_NAME "public.pem"
-#define DEC_KEY_NAME "private.pem"
+#define ENC_RSA_KEY_NAME "public.pem"
+#define DEC_RSA_KEY_NAME "private.pem"
 
 #include "benchmark.h"
 

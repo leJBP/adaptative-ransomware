@@ -31,6 +31,7 @@ Priorité:
 - [x] Decrypt AES-256
 - [ ] Encrypt Chacha20
 - [ ] Decrypt Chacha20
+- [ ] Refactoring functions
 - [ ] Main file
 - [x] Docker environment to test ransomware
 
