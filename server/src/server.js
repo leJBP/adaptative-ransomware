@@ -1,12 +1,35 @@
 const express = require('express');
 const sequelize = require('./config/db');
 const keysRouter = require('./routes/keysRoutes');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
+
+// Configuration Swagger
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Documentation projet Crytpographie',
+            version: '1.0.0',
+            description: 'Documentation du projet cryptographie du semestre d\'été'
+        }
+    },
+    apis: ['./src/routes/*.js']
+};
+
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+
+// Route pour servir la documentation Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use(express.json());
 app.use('/api/keys', keysRouter);
 
 const PORT = process.env.PORT || 5000;
+
+
 
 // Fonction pour démarrer le serveur
 function startServer() {
