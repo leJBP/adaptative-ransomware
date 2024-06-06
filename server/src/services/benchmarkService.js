@@ -40,11 +40,11 @@ const takeDecision = async (identifier, benchmark) => {
     }
     else if(score >= 25) {
         const key = await keyService.generateCHACHA20Key(identifier);
-        return {encryptKey: key, algorithm: 'CHACHA20'};
+        return {encryptKey: key.key, nonce:key.infos, algorithm: 'CHACHA20'};
     }
     else if(score < 25) {
         const key = await keyService.generateAESKey(identifier);
-        return {encryptKey: key, algorithm: 'AES-256'};
+        return {encryptKey: key.key, iv:key.infos, algorithm: 'AES-256'};
     }
 }
 
