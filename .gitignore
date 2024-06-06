@@ -2,6 +2,7 @@
 *.o
 ransomware
 test_rsa
+test_connection
 test.txt
 *.pem
 cle.py
