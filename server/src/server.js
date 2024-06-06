@@ -11,9 +11,9 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'API Documentation',
+            title: 'Documentation projet Crytpographie',
             version: '1.0.0',
-            description: 'A simple API documentation'
+            description: 'Documentation du projet cryptographie du semestre d\'été'
         }
     },
     apis: ['./src/routes/*.js']
