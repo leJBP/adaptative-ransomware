@@ -26,7 +26,17 @@ int main(int argc, char const *argv[])
 
     /* Envoi du benchmark au serveur */
     benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
-    char* p_key = get_encryption_key("25551", p_benchmarkData, &p_algo);
+
+    p_benchmarkData->memorySize = 8000;
+    p_benchmarkData->dataSize = 99999999999999999;
+    p_benchmarkData->cpuCore = 2;
+
+    char* p_key = get_encryption_key("77777", p_benchmarkData, &p_algo);
+
+    printf("key: %s\n", p_key);
+    printf("Algo: %s\n", p_algo);
+
+    p_key = get_decryption_key("77777", &p_algo);
 
     printf("key: %s\n", p_key);
     printf("Algo: %s\n", p_algo);
