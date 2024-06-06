@@ -3,7 +3,7 @@
 
 struct benchmarkData
 {
-    int dataSize;
+    long dataSize;
     int cpuCore;
     int cpuMinFreq;
     int cpuMaxFreq;

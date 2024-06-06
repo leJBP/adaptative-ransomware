@@ -66,7 +66,7 @@ static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_struct
         sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
 
         /* Add the benchmark data */
-        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
+        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %ld,\n\t", p_structKey, p_data->dataSize);
         strcat(p_body, p_tmp);
 
         sprintf(p_tmp, "\"cpuCores\": %d,\n\t", p_data->cpuCore);
