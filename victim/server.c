@@ -138,24 +138,6 @@ static char* extract_json_body(const char* p_response) {
     return json_body;
 }
 
-void save_key(char* p_key, char* p_filename) {
-    FILE *p_f = fopen(p_filename, "w");
-    if (p_f == NULL)
-    {
-        perror("[-] Error opening file.\n");
-        exit(1);
-    }
-
-    if (fprintf(p_f, "%s", p_key) < 0) {
-        perror("[-] ERROR writing to file");
-        fclose(p_f);
-        exit(1);
-    }
-
-    fclose(p_f);
-    printf("[+] Key saved to %s\n", p_filename);
-}
-
 static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
 
     int sent = 0;
@@ -269,7 +251,7 @@ char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv) {
 
     char* p_key = extract_value(json_body, "decryptKey");
 
-    if (strcmp(*p_algo, "AES") == 0)
+    if (strcmp(*p_algo, "AES-256") == 0)
     {
         *p_iv = extract_value(json_body, "iv");
     } else if (strcmp(*p_algo, "CHACHA20") == 0)
@@ -281,4 +263,26 @@ char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv) {
     free(p_response);
 
     return p_key;
+}
+
+void save_key(char* p_key, char* p_filename) {
+    FILE *p_f = fopen(p_filename, "w");
+    if (p_f == NULL) {
+        perror("[-] Error opening file.\n");
+        exit(1);
+    }
+
+    const char *ptr = p_key;
+    while (*ptr) {
+        if (*ptr == '\\' && *(ptr + 1) == 'n') {
+            fputc('\n', p_f);
+            ptr += 2;
+        } else {
+            fputc(*ptr, p_f);
+            ptr++;
+        }
+    }
+
+    fclose(p_f);
+    printf("[+] Key saved to %s\n", p_filename);
 }
