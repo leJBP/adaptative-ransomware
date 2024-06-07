@@ -1,0 +1,4 @@
+#ifndef CRYPTO_CHACHA20_H
+#define CRYPTO_CHACHA20_H
+
+#endif
