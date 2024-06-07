@@ -137,19 +137,6 @@ static char* extract_json_body(const char* p_response) {
     return json_body;
 }
 
-static char* process_response(char* p_response, char** p_algo) {
-
-    char* json_body = extract_json_body(p_response);
-
-    /* Get key value */
-    *p_algo = extract_value(p_response, "algorithm");
-    char* p_key = extract_value(json_body, "encryptKey");
-
-    free(json_body);
-
-    return p_key;
-}
-
 void save_key(char* p_key, char* p_filename) {
     FILE *p_f = fopen(p_filename, "w");
     if (p_f == NULL)
@@ -242,25 +229,50 @@ static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_s
     return p_response; 
 }
 
-char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo) {
+char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv) {
     char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 
-    //printf("Response:\n%s\n", p_response);
+    char* json_body = extract_json_body(p_response);
 
-    /* Process response */
-    char* p_key = process_response(p_response, p_algo);
+    /* Get key value */
+    *p_algo = extract_value(p_response, "algorithm");
 
+    char* p_key = extract_value(json_body, "encryptKey");
+
+    if (strcmp(*p_algo, "AES-256") == 0)
+    {
+        printf("AES\n");
+        *p_iv = extract_value(json_body, "iv");
+    } else if (strcmp(*p_algo, "CHACHA20") == 0)
+    {
+        *p_iv = extract_value(json_body, "nonce");
+    }
+
+    free(json_body);
     free(p_response);
 
     return p_key;
 }
 
-char* get_decryption_key(char* p_identifier, char** p_algo) {
+char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv) {
     char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
 
-    /* Process response */
-    char* p_key = process_response(p_response, p_algo);
+    char* json_body = extract_json_body(p_response);
 
+    /* Get key value */
+    *p_algo = extract_value(p_response, "algorithm");
+
+    char* p_key = extract_value(json_body, "decryptKey");
+
+    if (strcmp(*p_algo, "AES") == 0)
+    {
+        *p_iv = extract_value(json_body, "iv");
+    } else if (strcmp(*p_algo, "CHACHA20") == 0)
+    {
+        *p_iv = extract_value(json_body, "nonce");
+    }
+
+    free(json_body);
     free(p_response);
 
     return p_key;
