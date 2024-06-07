@@ -76,11 +76,12 @@ static void get_cpu_data(benchmarkData* p_data)
 
     /* Check if all the info has been found */
     if (p_maxFreq != NULL && p_minFreq != NULL && p_core != NULL) {
-        p_data->cpuMaxFreq = atof(p_maxFreq);
-        p_data->cpuMinFreq = atof(p_minFreq);
+        p_data->cpuMaxFreq = (int) atof(p_maxFreq);
+        p_data->cpuMinFreq = (int) atof(p_minFreq);
         p_data->cpuCore = atoi(p_core);
     } else {
         printf("[-] Failed to find CPU max/min frequency or core\n");
+        exit(1);
     }
 
     pclose(fp);
@@ -93,16 +94,16 @@ static void get_cpu_data(benchmarkData* p_data)
 benchmarkData* benchmark_pc(int size)
 {
 
-    benchmarkData* data = (benchmarkData*)malloc(sizeof(benchmarkData));
+    benchmarkData* p_data = (benchmarkData*)malloc(sizeof(benchmarkData));
 
-    if (data == NULL) {
+    if (p_data == NULL) {
         perror("[-] benchmark_pc failed");
         exit(EXIT_FAILURE);
     }
 
-    data->dataSize = size;
-    get_ram_size(data);
-    get_cpu_data(data);
+    p_data->dataSize = size;
+    get_ram_size(p_data);
+    get_cpu_data(p_data);
 
-    return data;
+    return p_data;
 }
