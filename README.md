@@ -24,7 +24,7 @@ Priorité:
 - [x] Retrieve key for decryption from attacker server
 - [x] Encrypt RSA
 - [x] Decrypt RSA
-- [ ] Modification RSA pour gros fichiers
+- [x] Modification RSA pour gros fichiers
 - [x] Benchmark (local)
 - [ ] Benchmark (serveur)
 - [x] Encrypt AES-256

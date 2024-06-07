@@ -1,7 +1,7 @@
 # Définition des Variables (à compléter)
 CC=gcc
 CFLAGS=-Wall -pedantic -g
-LDFLAGS= -lssl -lcrypto -fopenmp
+LDFLAGS= -lssl -lcrypto
 
 # Règles (à compléter avec des variables automatiques)
 all: ransomware clean

@@ -62,15 +62,23 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
     unsigned char* outBuf = NULL;
     size_t outLen = 0;
 
+    size_t keySize = EVP_PKEY_size(p_pubKey);
+
+    /* Split plain text in keySize - Padding size to encrypt big files */
+    int nbBlocks = inLen / (keySize - PADDING_SIZE);
+    int rest = inLen % (keySize - PADDING_SIZE);
+
     /* Encryption environment initialisation */
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(p_pubKey, NULL);
     EVP_PKEY_encrypt_init(ctx);
 
     /* Calculate the size required to hold the encrypted data */
-    if (EVP_PKEY_encrypt(ctx, NULL, &outLen, inBuf, inLen) <= 0) {
-        perror("[-] Size computation failed\n");
-        exit(2);
-    }
+    //if (EVP_PKEY_encrypt(ctx, NULL, &outLen, inBuf, inLen) <= 0) {
+    //    perror("[-] Size computation failed\n");
+    //    exit(2);
+    //}
+
+    outLen = (nbBlocks + (rest > 0)) * keySize;
 
     outBuf = OPENSSL_zalloc(outLen);
     if(outBuf == NULL)
@@ -79,10 +87,23 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
         exit(2);
     }
 
-    /* Encrypt file */
-    if (!EVP_PKEY_encrypt(ctx, outBuf, &outLen, inBuf, inLen)) {
-        perror("[-] Encryption failed\n");
-        exit(2);
+
+    /* Encrypt each block and put encrypted data in outBuf */
+    for (int i = 0; i < nbBlocks; i++)
+    {
+        if (!EVP_PKEY_encrypt(ctx, outBuf + i * keySize, &keySize, inBuf + i * (keySize - PADDING_SIZE), keySize - PADDING_SIZE)) {
+            perror("[-] Encryption failed\n");
+            exit(2);
+        }
+    }
+
+    /* Encrypt the last block if rest no null */
+    if (rest != 0)
+    {
+        if (!EVP_PKEY_encrypt(ctx, outBuf + nbBlocks * keySize, &keySize, inBuf + nbBlocks * (keySize - PADDING_SIZE), rest)) {
+            perror("[-] Encryption failed\n");
+            exit(2);
+        }
     }
 
     /* Open the file in write mode */
@@ -109,6 +130,7 @@ static void encrypt_file(fileData* p_fileData, EVP_PKEY* p_pubKey)
     free(p_filePath);
     free(inBuf);
     free(outBuf);
+    ctx = NULL, p_filePath = NULL, inBuf = NULL, outBuf = NULL;
 }
 
 static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
@@ -121,35 +143,52 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
         perror("[-] malloc failed");
         exit(1);
     }
-    sprintf(p_filePath, "%s/%s", p_fileData->p_path, p_fileData->p_name);
+    sprintf(p_filePath, "%s%s", p_fileData->p_path, p_fileData->p_name);
 
     /* Buffers environment */
     size_t inLen = 0;
     unsigned char* inBuf = get_file_content(p_filePath, &inLen);
     unsigned char* outBuf = NULL;
+    size_t outAlloc = 0;
     size_t outLen = 0;
+    size_t inBlockSize = 0;
+
+    size_t keySize = EVP_PKEY_size(p_privKey);
+    inBlockSize = keySize;
+
+    /* Split cipher text in block to decrypt it */
+    int nbBlocks = inLen / keySize;
 
     /* Encryption environment initialisation */
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(p_privKey, NULL);
     EVP_PKEY_decrypt_init(ctx);
 
-    /* Calculate the size required to hold the encrypted data */
-    if (EVP_PKEY_decrypt(ctx, NULL, &outLen, inBuf, inLen) <= 0) {
-        perror("[-] Size computation failed\n");
-        exit(2);
-    }
+    /* Calculate the size required to hold the decrypted data */
+    //if (EVP_PKEY_decrypt(ctx, NULL, &outLen, inBuf, inLen) <= 0) {
+    //    perror("[-] Size computation failed\n");
+    //    exit(2);
+    //}
 
-    outBuf = OPENSSL_zalloc(outLen);
+    outAlloc = nbBlocks * (keySize - PADDING_SIZE);
+
+    outBuf = OPENSSL_zalloc(outAlloc);
     if(outBuf == NULL)
     {
         perror("[-] OPENSSL_zalloc failed\n");
         exit(2);
     }
 
-    /* Decrypt the file */
-    if (!EVP_PKEY_decrypt(ctx, outBuf, &outLen, inBuf, inLen)) {
-        perror("[-] Decryption failed\n");
-        exit(2);
+    /* Decrypt each block and put decrypted data in outBuf */
+    for (int i = 0; i < nbBlocks; i++)
+    {
+        keySize = inBlockSize;
+        if(!EVP_PKEY_decrypt(ctx, outBuf + i * (inBlockSize - PADDING_SIZE), &keySize, inBuf + i * inBlockSize, inBlockSize))
+        {
+            perror("[-] Decryption failed\n");
+            exit(2);
+        }
+        outLen += keySize;
+        //printf("i: %ld\n", keySize);
     }
 
     /* Open the file in write mode */
@@ -176,7 +215,7 @@ static void decrypt_file(fileData* p_fileData, EVP_PKEY* p_privKey)
     free(inBuf);
     free(outBuf);
     EVP_PKEY_CTX_free(ctx);
-
+    ctx = NULL, p_filePath = NULL, inBuf = NULL, outBuf = NULL;
 }
 
 void rsa_encrypt_files(listFileData* p_listFileData, EVP_PKEY* p_pubKey)
@@ -214,6 +253,10 @@ EVP_PKEY* rsa_load_key(char* p_filename, int selection )
                                      selection,
                                      NULL, NULL);
 
+    if (dctx == NULL) {
+        /* error: no suitable potential decoders found */
+        printf("[-] Error no suitable potential decoders found \n");
+    }
 
     /* Open public.pem */
     BIO *bio = BIO_new_file(p_filename, "rb");
@@ -228,11 +271,11 @@ EVP_PKEY* rsa_load_key(char* p_filename, int selection )
     }
     if (OSSL_DECODER_from_bio(dctx, bio)) {
         /* pkey is created with the decoded data from the bio */
-        printf("[+] Decoding success\n");
+        printf("[+] Key Decoding success %s\n", p_filename);
 
     } else {
         /* decoding failure */
-        printf("[-] Error decoding\n");
+        printf("[-] Error key decoding\n");
     }
     OSSL_DECODER_CTX_free(dctx);
     BIO_free(bio);
