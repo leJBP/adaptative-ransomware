@@ -29,8 +29,8 @@ Priorité:
 - [ ] Benchmark (serveur)
 - [x] Encrypt AES-256
 - [x] Decrypt AES-256
-- [ ] Encrypt Chacha20
-- [ ] Decrypt Chacha20
+- [x] Encrypt Chacha20
+- [x] Decrypt Chacha20
 - [ ] Main file
 - [x] Docker environment to test ransomware
 
