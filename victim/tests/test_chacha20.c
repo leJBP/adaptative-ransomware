@@ -40,7 +40,8 @@ int main(int argc, char const *argv[])
 
     free_path_data(p_listFileData);
 
-    EVP_PKEY_free(p_privKey);
+    EVP_PKEY_free(p_e_ctx);
+    EVP_PKEY_free(p_d_ctx);
 
     return EXIT_SUCCESS;
 }
