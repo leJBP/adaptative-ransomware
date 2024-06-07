@@ -17,6 +17,7 @@ CREATE TABLE public."symetricKeys"
     identifier character varying NOT NULL,
     key text NOT NULL,
     algorithm character varying COLLATE pg_catalog."default",
+    infos text NOT NULL,
     PRIMARY KEY (identifier)
 );
 ALTER TABLE public."symetricKeys" OWNER to postgres;
