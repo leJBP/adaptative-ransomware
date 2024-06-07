@@ -22,11 +22,11 @@ services:
       - ./:/docker-entrypoint-initdb.d
       - postgres_crypto_data:/var/lib/postgresql/data
 
-  #victim:
-  #  build: ../victim
-  #  entrypoint: /bin/bash
-  #  stdin_open: true
-  #  tty: true
+  victim:
+    build: ../victim
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
 
 volumes:
   postgres_crypto_data:
