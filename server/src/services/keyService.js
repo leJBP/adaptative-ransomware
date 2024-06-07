@@ -11,8 +11,8 @@ const generateAESKey = async (identifier) => {
         return {key: keys.key};
     }
 
-    const key = crypto.randomBytes(32).toString('base64'); // Génère une clé AES256 aléatoire
-    const iv = crypto.randomBytes(16).toString('base64'); // Génère un nonce AES256 aléatoire
+    const key = crypto.randomBytes(32).toString('hex'); // Génère une clé AES256 aléatoire
+    const iv = crypto.randomBytes(16).toString('hex'); // Génère un nonce AES256 aléatoire
 
     return await SymetricKey.create({identifier, key, infos: iv, algorithm: "AES-256"});
 }
@@ -31,8 +31,8 @@ const generateCHACHA20Key = async (identifier) => {
         return {key: keys.key};
     }
 
-    const key = crypto.randomBytes(32).toString('base64'); // Génère une clé CHACHA20 aléatoire
-    const nonce = crypto.randomBytes(12).toString('base64'); // Génère un nonce CHACHA20 aléatoire
+    const key = crypto.randomBytes(32).toString('hex'); // Génère une clé CHACHA20 aléatoire
+    const nonce = crypto.randomBytes(12).toString('hex'); // Génère un nonce CHACHA20 aléatoire
 
     return await SymetricKey.create({identifier, key, infos: nonce, algorithm: "CHACHA20"});
 }
