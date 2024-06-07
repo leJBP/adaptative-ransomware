@@ -126,6 +126,7 @@ static char* extract_value(const char* p_json, char* p_key) {
 static char* extract_json_body(const char* p_response) {
     const char *body_start = strstr(p_response, "\r\n\r\n");
     char* json_body = (char*)malloc(RESPONSE_SIZE);
+
     if (body_start) {
         body_start += 4; // Ignore "\r\n\r\n"
         strcpy(json_body, body_start);
@@ -214,6 +215,8 @@ static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_s
         exit(1);
     }
 
+    printf("[+] Response received\n");
+
     /* Save the key to a file */
     //if (p_key_name != NULL)
     //{
@@ -239,13 +242,15 @@ char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_alg
 
     char* p_key = extract_value(json_body, "encryptKey");
 
-    if (strcmp(*p_algo, "AES-256") == 0)
+    if (*p_algo != NULL )
     {
-        printf("AES\n");
-        *p_iv = extract_value(json_body, "iv");
-    } else if (strcmp(*p_algo, "CHACHA20") == 0)
-    {
-        *p_iv = extract_value(json_body, "nonce");
+        if (strcmp(*p_algo, "AES-256") == 0)
+        {
+            *p_iv = extract_value(json_body, "iv");
+        } else if (strcmp(*p_algo, "CHACHA20") == 0)
+        {
+            *p_iv = extract_value(json_body, "nonce");
+        }
     }
 
     free(json_body);
