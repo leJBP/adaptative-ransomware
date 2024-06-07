@@ -23,5 +23,6 @@ files_finder.o: files_finder.h
 ransomware.o: files_finder.h
 crypto_rsa.o: crypto_rsa.h files_finder.h
 crypto_aes.o: crypto_aes.h files_finder.h
+crypto_chacha20.o: crypto_chacha20.h files_finder.h
 server.o: server.h
 benchmark.o: benchmark.h
