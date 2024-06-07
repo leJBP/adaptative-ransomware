@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/evp.h>
-#include <files_finder.h>
 
 static unsigned char* get_file_content(char* p_filePath, size_t* p_inLen)
 {
@@ -84,7 +83,7 @@ void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
     unsigned char* outBuf = malloc(sizeof(unsigned char) * inLen);
 
     /* Encryption environment initialisation */
-    if(!EVP_EncryptInit_ex(p_key,EVP_chacha20(), NULL, NULL, NULL, NULL))
+    if(!EVP_EncryptInit_ex(p_key,EVP_chacha20(), NULL, NULL, NULL))
     {
         perror("[-] EVP_EncryptInit_ex failed");
         exit(1);
@@ -159,7 +158,7 @@ void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
     unsigned char* outBuf = malloc(sizeof(unsigned char) * inLen);
 
     /* Encryption environment initialisation */
-    if(!EVP_DecryptInit_ex(p_key, EVP_chacha20(), NULL, NULL, NULL, NULL))
+    if(!EVP_DecryptInit_ex(p_key, EVP_chacha20(), NULL, NULL, NULL))
     {
         perror("[-] EVP_DecryptInit_ex failed");
         exit(1);
@@ -169,14 +168,14 @@ void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
     printf("[+] File size: %ld\n", inLen);
 
     /* Encrypt data blocks */
-    if(!EVP_EncryptUpdate(p_key, outBuf, &plainInLen, inBuf, inLen))
+    if(!EVP_DecryptUpdate(p_key, outBuf, &plainLen, inBuf, inLen))
     {
         perror("[-] EVP_DecryptUpdate failed");
         exit(1);
     }
 
     printf("[+] Decrypted data: %s\n", outBuf);
-    printf("[+] Decrypted data size: %d\n", plainInLen);
+    printf("[+] Decrypted data size: %d\n", plainLen);
 
     /* update ciphertext with the final remaining bytes */
     if(!EVP_DecryptFinal_ex(p_key, outBuf+plainLen, &finalLen))
@@ -185,7 +184,7 @@ void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
         exit(1);
     }
 
-    outLen = plainInLen + finalLen;
+    outLen = plainLen + finalLen;
 
     printf("[+] Decrypted data: %s\n", outBuf);
     printf("[+] Decrypted data size: %d\n", outLen);
@@ -233,20 +232,20 @@ void chacha20_decrypt_files(listFileData* p_listFileData, EVP_CIPHER_CTX* p_key)
     }
 }
 
-EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_iv) {
+EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_nonce) {
     EVP_CIPHER_CTX* e_ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(e_ctx);
-    EVP_EncryptInit_ex(e_ctx, EVP_chacha20(), NULL, p_key, p_iv);
+    EVP_EncryptInit_ex(e_ctx, EVP_chacha20(), NULL, p_key, p_nonce);
 
     printf("[+] Encryption key loaded\n");
 
     return e_ctx;
 }
 
-EVP_CIPHER_CTX* load_decryption_key(unsigned char* p_key, unsigned char* p_iv) {
+EVP_CIPHER_CTX* load_decryption_key(unsigned char* p_key, unsigned char* p_nonce) {
     EVP_CIPHER_CTX* d_ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(d_ctx);
-    EVP_DecryptInit_ex(d_ctx, EVP_chacha20(), NULL, p_key, p_iv);
+    EVP_DecryptInit_ex(d_ctx, EVP_chacha20(), NULL, p_key, p_nonce);
 
     printf("[+] Decryption key loaded\n");
 
