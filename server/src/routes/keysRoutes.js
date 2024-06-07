@@ -100,6 +100,9 @@ router.post('/generate', benchmarkService.validateBenchmark, async (req, res) =>
  *                 decryptKey:
  *                   type: string
  *                   description: Clé de déchiffrement
+ *                 infos:
+ *                   type: object
+ *                   description: Informations additionnelles nécessaies pour le déchiffrement
  *                 algorithm:
  *                   type: string
  *                   description: Algorithme de chiffrement
@@ -108,8 +111,10 @@ router.post('/generate', benchmarkService.validateBenchmark, async (req, res) =>
  */
  router.post('/decrypt', async (req, res) => {
     const {identifier} = req.body;
-    const {decryptKey, algorithm} = await keyService.getDecryptKey(identifier);
-    res.send({decryptKey, algorithm});
+    if(!identifier) return res.status(400).send('Identifier is required');
+    if(!await keyService.findKey(identifier)) return res.status(404).send('Key not found');
+    const key = await keyService.getDecryptKey(identifier);
+    res.send(key);
 });
 
 /**

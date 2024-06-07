@@ -131,7 +131,13 @@ const getDecryptKey = async (identifier) => {
     const key = await findKey(identifier);
     // Si la clé est symétrique, on la renvoie
     if (key && key.key) {
-        return {decryptKey: key.key, algorithm: key.algorithm};
+        if(key.algorithm === "AES-256") {
+            return {decryptKey: key.key, iv: key.infos, algorithm: key.algorithm};
+        }
+        if(key.algorithm === "CHACHA20") {
+            return {decryptKey: key.key, nonce: key.infos, algorithm: key.algorithm};
+        }
+        return {decryptKey: key.key, infos: key.infos, algorithm: key.algorithm};
     }
     // Si la clé est asymétrique, on renvoie la clé privée
     if (key && key.privateKey) {
