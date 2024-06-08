@@ -3,6 +3,7 @@
 ransomware
 test_rsa
 test_connection
+test_get_identifier
 test.txt
 *.pem
 cle.py
