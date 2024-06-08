@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y make
 WORKDIR /usr/src/app
 
 # Copy the source code
-COPY * .
+COPY . .
 
 # Compile the source code
 RUN make all
