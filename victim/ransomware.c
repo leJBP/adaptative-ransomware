@@ -148,8 +148,6 @@ int main(int argc, char const *argv[])
         /* Get the encryption key based on the benchmark */
         p_key = get_encryption_key(p_macAddress, p_benchmarkData, &p_algo, &p_iv);
 
-        printf("key: %s\n", p_key);
-
         printf("[+] Encryption key GET success\n");
 
         if (p_algo != NULL)
@@ -198,6 +196,7 @@ int main(int argc, char const *argv[])
         /* Free memory */
         free(p_key);
         free(p_algo);
+        free(p_benchmarkData);
 
     }
 

@@ -48,7 +48,7 @@ static int connect_to_server(char* p_host, int port) {
         exit(1);
     }
 
-    printf("\n[+] Connected to %s:%d\n", p_host, port);
+    printf("[+] Connected to %s:%d\n", p_host, port);
 
     return sockfd;
 }
@@ -150,7 +150,6 @@ static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, 
 
     /* Connect to the server and get the encryption key. */
     int serverfd = connect_to_server(p_host, p_port);
-    //printf("Serverfd: %d\n", serverfd);
 
     /* Send the request */
     char* p_message = NULL;
@@ -159,8 +158,6 @@ static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, 
 
     p_body = json_body(p_identifier, p_data, p_structKey);
     p_message = format_request(p_api_url, p_host, p_endpoint, p_body, p_requestType);
-
-    //printf("Request:\n%s\n", p_message);
 
     printf("[+] Sending request to server\n");
 
@@ -201,12 +198,6 @@ static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, 
     }
 
     printf("[+] Response received\n");
-
-    /* Save the key to a file */
-    //if (p_key_name != NULL)
-    //{
-    //    save_key(p_key, p_key_name);
-    //}
 
     /* Free memory */
     free(p_message);
