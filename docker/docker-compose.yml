@@ -9,6 +9,9 @@ services:
       - ../server/.env
     depends_on:
       - postgres
+    networks:
+      crypto-net:
+        ipv4_address: 30.0.0.2
 
   postgres:
     image: postgres:latest
@@ -21,12 +24,27 @@ services:
     volumes:
       - ./:/docker-entrypoint-initdb.d
       - postgres_crypto_data:/var/lib/postgresql/data
+    networks:
+      crypto-net:
+        ipv4_address: 30.0.0.3
 
   victim:
     build: ../victim
     entrypoint: /bin/bash
     stdin_open: true
     tty: true
+    environment:
+      - USER=victime-docker
+    networks:
+      crypto-net:
+        ipv4_address: 30.0.0.4
 
 volumes:
   postgres_crypto_data:
+
+networks:
+  crypto-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 30.0.0.0/24

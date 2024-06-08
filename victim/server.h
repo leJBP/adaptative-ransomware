@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #define KEY_HOST "localhost"
+#define KEY_HOST_DOCKER "30.0.0.2"
 #define KEY_PORT 5000
 #define API_URL "/api/keys/"
 #define REQ_POST "POST"

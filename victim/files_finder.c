@@ -14,7 +14,7 @@ static void add_file(listFileData* p_listFileData, char* p_name, char* p_path)
     /* Error detection in memory allocation */
     if (p_newFileData == NULL)
     {
-        fprintf(stderr, "Error: malloc failed\n");
+        perror("[-] Error: malloc failed\n");
         exit(EXIT_FAILURE);
     }
     p_newFileData->p_name = p_name;
@@ -70,7 +70,7 @@ static void analyze_path(listFileData* p_listFileData, char* p_path)
                 char* p_fileName = malloc(sizeof(char) * (strlen(dp->d_name) + 1));
                 if (p_fileName == NULL)
                 {
-                    fprintf(stderr, "Error: malloc failed\n");
+                    perror("[-] Error: malloc failed\n");
                     exit(EXIT_FAILURE);
                 }
                 strcpy(p_fileName, dp->d_name);
@@ -78,7 +78,7 @@ static void analyze_path(listFileData* p_listFileData, char* p_path)
                 char* p_filePath = malloc(strlen(p_path) + 1);
                 if (p_filePath == NULL)
                 {
-                    fprintf(stderr, "Error: malloc failed\n");
+                    perror("[-] Error: malloc failed\n");
                     exit(EXIT_FAILURE);
                 }
                 strcpy(p_filePath, p_path);
@@ -105,7 +105,7 @@ listFileData* init_list_file_data()
     /* Error detection in memory allocation */
     if (p_listFileData == NULL)
     {
-        fprintf(stderr, "Error: malloc failed\n");
+        perror("[-] Error: malloc failed\n");
         exit(EXIT_FAILURE);
     }
     p_listFileData->p_head = NULL;
@@ -114,10 +114,10 @@ listFileData* init_list_file_data()
 
 char* get_username()
 {
-    char* p_username = getlogin();
+    char* p_username = getenv("USER");
     if (p_username == NULL)
     {
-        fprintf(stderr, "Error: getlogin failed\n");
+        perror("[-] Error: getlogin failed\n");
         exit(EXIT_FAILURE);
     }
     return p_username;
