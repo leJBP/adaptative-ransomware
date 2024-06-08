@@ -53,17 +53,17 @@ static int connect_to_server(char* p_host, int port) {
     return sockfd;
 }
 
-static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_structKey) {
+static char* json_body(unsigned char* p_identifier, benchmarkData* p_data, char* p_structKey) {
     char* p_body = NULL;
     p_body = (char*)malloc(250);
     if (p_data == NULL)
     {
-        sprintf(p_body, "{\"identifier\": \"%s\"}", p_identifier);
+        sprintf(p_body, "{\"identifier\": \"%02X:%02X:%02X:%02X:%02X:%02X\"}", p_identifier[0], p_identifier[1], p_identifier[2], p_identifier[3], p_identifier[4], p_identifier[5]);
     } else {
 
         char* p_tmp = (char*)malloc(250);
         /* Header json with identifier value */
-        sprintf(p_body, "{\n\"identifier\": \"%s\",\n", p_identifier);
+        sprintf(p_body, "{\n\"identifier\": \"%02X:%02X:%02X:%02X:%02X:%02X\",\n", p_identifier[0], p_identifier[1], p_identifier[2], p_identifier[3], p_identifier[4], p_identifier[5]);
 
         /* Add the benchmark data */
         sprintf(p_tmp, "\"%s\": {\n\t\"dataSize\": %ld,\n\t", p_structKey, p_data->dataSize);
@@ -89,16 +89,16 @@ static char* json_body(char* p_identifier, benchmarkData* p_data, char* p_struct
     return p_body;
 }
 
-static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p_body) {
+static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p_body, char* p_requestType) {
     char* p_request = (char*)malloc(strlen(p_url) + strlen(p_endpoint) + strlen(p_host) + strlen(p_body) + 100);
     sprintf(p_request, 
-        "POST %s%s HTTP/1.0\r\n"
+        "%s %s%s HTTP/1.0\r\n"
         "Host: %s\r\n"
         "Content-Type: application/json\r\n"
         "Content-Length: %ld\r\n"
         "\r\n"
         "%s",
-        p_url, p_endpoint,
+        p_requestType, p_url, p_endpoint,
         p_host, strlen(p_body), p_body);
     return p_request;
 }
@@ -138,7 +138,7 @@ static char* extract_json_body(const char* p_response) {
     return json_body;
 }
 
-static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_endpoint, char* p_api_url, char* p_host, int p_port) {
+static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, char* p_structKey, char* p_endpoint, char* p_api_url, char* p_host, int p_port, char* p_requestType) {
 
     int sent = 0;
     int received = 0;
@@ -155,7 +155,7 @@ static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_s
     char* p_body = NULL;
 
     p_body = json_body(p_identifier, p_data, p_structKey);
-    p_message = format_request(p_api_url, p_host, p_endpoint, p_body);
+    p_message = format_request(p_api_url, p_host, p_endpoint, p_body, p_requestType);
 
     //printf("Request:\n%s\n", p_message);
 
@@ -214,8 +214,8 @@ static char* contact_server(char* p_identifier, benchmarkData* p_data, char* p_s
     return p_response; 
 }
 
-char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv) {
-    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv) {
+    char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
 
@@ -241,8 +241,8 @@ char* get_encryption_key(char* p_identifier, benchmarkData* p_data, char** p_alg
     return p_key;
 }
 
-char* get_decryption_key(char* p_identifier, char** p_algo, char** p_iv) {
-    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT);
+char* get_decryption_key(unsigned char* p_identifier, char** p_algo, char** p_iv) {
+    char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
 
@@ -285,4 +285,15 @@ void save_key(char* p_key, char* p_filename) {
 
     fclose(p_f);
     printf("[+] Key saved to %s\n", p_filename);
+}
+
+void delete_id(unsigned char* p_id)
+{
+    char* p_response = contact_server(p_id, NULL, NULL, DEL_IDENTIFIER_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_DEL);
+
+    printf("[+] Identifier deleted\n");
+
+    printf("[+] Response: %s\n", p_response);
+
+    free(p_response);
 }

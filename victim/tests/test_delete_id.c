@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../benchmark.h"
 #include "../server.h"
@@ -30,7 +31,7 @@ int main(int argc, char const *argv[])
     p_benchmarkData->dataSize = 99999999999999;
     p_benchmarkData->cpuCore = 1;
 
-    char* p_key = get_encryption_key((char*)id, p_benchmarkData, &p_algo, &p_iv);
+    char* p_key = get_encryption_key(id, p_benchmarkData, &p_algo, &p_iv);
 
     printf("key: %s\n", p_key);
     printf("iv: %s\n", p_iv);
@@ -40,6 +41,7 @@ int main(int argc, char const *argv[])
     delete_id(id);
 
     free_path_data(p_listFileData);
+    free(p_benchmarkData);
     free(id);
     free(p_key);
     free(p_algo);
