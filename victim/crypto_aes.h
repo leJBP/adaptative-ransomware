@@ -30,7 +30,7 @@ void aes_decrypt_files(listFileData* p_listFileData, EVP_CIPHER_CTX* p_key);
  * @param p_iv Initialization vector.
  * @return The encryption key structure.
 */
-EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_iv);
+EVP_CIPHER_CTX* load_aes_encryption_key(unsigned char* p_key, unsigned char* p_iv);
 
 /**
  * @brief Load the decryption key.
@@ -38,6 +38,6 @@ EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_iv);
  * @param p_iv Initialization vector.
  * @return The decryption key structure.
 */
-EVP_CIPHER_CTX* load_decryption_key(unsigned char* p_key, unsigned char* p_iv);
+EVP_CIPHER_CTX* load_aes_decryption_key(unsigned char* p_key, unsigned char* p_iv);
 
 #endif

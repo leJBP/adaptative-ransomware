@@ -10,16 +10,14 @@
 
 /**
  * @brief Encrypts a file using a key with RSA algorithm
- * @param p_path Path to the file to encrypt
- * @param p_name Name of the file to encrypt
+ * @param p_listFileData List of files to encrypt
  * @param p_pubKey public key to use for encryption
 */
 void rsa_encrypt_files(listFileData* p_listFileData, EVP_PKEY* p_pubKey);
 
 /**
  * @brief Decrypts a file using a key with RSA algorithm
- * @param p_path Path to the file to decrypt
- * @param p_name Name of the file to decrypt
+ * @param p_listFileData List of files to decrypt
  * @param p_privKey private key to use for decryption
 */
 void rsa_decrypt_files(listFileData* p_listFileData, EVP_PKEY* p_privKey);
