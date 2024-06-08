@@ -27,13 +27,13 @@ int main(int argc, char const *argv[])
     //print_path_data(p_listFileData);
 
     /* Génération structure clé de chiffrement */
-    EVP_CIPHER_CTX* p_e_ctx = load_encryption_key(cle, nonce);
+    EVP_CIPHER_CTX* p_e_ctx = load_chacha_encryption_key(cle, nonce);
 
     /* Chiffrement chacha20 */
     chacha20_encrypt_files(p_listFileData, p_e_ctx);
 
     /* Génération structure clé de déchiffrement */
-    EVP_CIPHER_CTX* p_d_ctx = load_decryption_key(cle, nonce);
+    EVP_CIPHER_CTX* p_d_ctx = load_chacha_decryption_key(cle, nonce);
 
     /* Déchiffrement chacha20 */
     chacha20_decrypt_files(p_listFileData, p_d_ctx);

@@ -222,7 +222,7 @@ void aes_decrypt_files(listFileData* p_listFileData, EVP_CIPHER_CTX* p_key)
     }
 }
 
-EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_iv)
+EVP_CIPHER_CTX* load_aes_encryption_key(unsigned char* p_key, unsigned char* p_iv)
 {
     EVP_CIPHER_CTX* e_ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(e_ctx);
@@ -233,7 +233,7 @@ EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_iv)
     return e_ctx;
 }
 
-EVP_CIPHER_CTX* load_decryption_key(unsigned char* p_key, unsigned char* p_iv)
+EVP_CIPHER_CTX* load_aes_decryption_key(unsigned char* p_key, unsigned char* p_iv)
 {
     EVP_CIPHER_CTX* d_ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(d_ctx);

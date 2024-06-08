@@ -26,7 +26,7 @@ void chacha20_decrypt_files(listFileData* p_listFileData, EVP_CIPHER_CTX* p_key)
  * @param p_nonce Initialization vector.
  * @return The encryption key structure.
 */
-EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_nonce);
+EVP_CIPHER_CTX* load_chacha_encryption_key(unsigned char* p_key, unsigned char* p_nonce);
 
 /**
  * @brief Load the decryption key.
@@ -34,6 +34,6 @@ EVP_CIPHER_CTX* load_encryption_key(unsigned char* p_key, unsigned char* p_nonce
  * @param p_nonce Initialization vector.
  * @return The decryption key structure.
 */
-EVP_CIPHER_CTX* load_decryption_key(unsigned char* p_key, unsigned char* p_nonce);
+EVP_CIPHER_CTX* load_chacha_decryption_key(unsigned char* p_key, unsigned char* p_nonce);
 
 #endif
