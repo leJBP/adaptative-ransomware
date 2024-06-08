@@ -28,7 +28,7 @@ makedepend:
 	makedepend *.c -Y
 
 clean:
-	rm *.o
+	rm *.o test_delete_id test_get_identifier test_connection test_rsa test_aes test_chacha20
 
 .PHONY: clean all makedepend
 
