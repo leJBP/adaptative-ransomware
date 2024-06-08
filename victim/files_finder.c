@@ -127,6 +127,7 @@ void files_finder(listFileData* p_listFileData, char** pp_paths, int countPaths)
 {
     for (int i = 0; i < countPaths; i++)
     {
+        printf("[+] Analyzing path: %s\n", *(pp_paths+i));
         analyze_path(p_listFileData, *(pp_paths+i));
     }
 }
