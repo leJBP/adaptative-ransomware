@@ -89,18 +89,12 @@ void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
         exit(1);
     }
 
-    printf("[+] Encrypting file: %s\n", p_filePath);
-    printf("[+] File size: %ld\n", inLen);
-
     /* Encrypt data blocks */
     if(!EVP_EncryptUpdate(p_key, outBuf, &cipherInLen, inBuf, inLen))
     {
         perror("[-] EVP_EncryptUpdate failed");
         exit(1);
     }
-
-    printf("[+] Encrypted data: %s\n", outBuf);
-    printf("[+] Encrypted data size: %d\n", cipherInLen);
 
     /* update ciphertext with the final remaining bytes */
     if(!EVP_EncryptFinal_ex(p_key, outBuf+cipherInLen, &finalLen))
@@ -110,9 +104,6 @@ void encrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
     }
 
     outLen = cipherInLen + finalLen;
-
-    printf("[+] Encrypted data: %s\n", outBuf);
-    printf("[+] Encrypted data size: %d\n", outLen);
  
     /* Open the file in write mode */
     FILE* p_file = fopen(p_filePath, "wb");
@@ -164,18 +155,12 @@ void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
         exit(1);
     }
 
-    printf("[+] Decrypting file: %s\n", p_filePath);
-    printf("[+] File size: %ld\n", inLen);
-
     /* Encrypt data blocks */
     if(!EVP_DecryptUpdate(p_key, outBuf, &plainLen, inBuf, inLen))
     {
         perror("[-] EVP_DecryptUpdate failed");
         exit(1);
     }
-
-    printf("[+] Decrypted data: %s\n", outBuf);
-    printf("[+] Decrypted data size: %d\n", plainLen);
 
     /* update ciphertext with the final remaining bytes */
     if(!EVP_DecryptFinal_ex(p_key, outBuf+plainLen, &finalLen))
@@ -185,9 +170,6 @@ void decrypt_file(fileData* p_fileData, EVP_CIPHER_CTX* p_key) {
     }
 
     outLen = plainLen + finalLen;
-
-    printf("[+] Decrypted data: %s\n", outBuf);
-    printf("[+] Decrypted data size: %d\n", outLen);
  
     /* Open the file in write mode */
     FILE* p_file = fopen(p_filePath, "wb");
