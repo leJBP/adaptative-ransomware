@@ -55,13 +55,14 @@ static int connect_to_server(char* p_host, int port) {
 
 static char* json_body(unsigned char* p_identifier, benchmarkData* p_data, char* p_structKey) {
     char* p_body = NULL;
-    p_body = (char*)malloc(250);
+    printf("[+] Creating json body\n");
+    p_body = (char*)malloc(300);
     if (p_data == NULL)
     {
         sprintf(p_body, "{\"identifier\": \"%02X:%02X:%02X:%02X:%02X:%02X\"}", p_identifier[0], p_identifier[1], p_identifier[2], p_identifier[3], p_identifier[4], p_identifier[5]);
     } else {
 
-        char* p_tmp = (char*)malloc(250);
+        char* p_tmp = (char*)malloc(300);
         /* Header json with identifier value */
         sprintf(p_body, "{\n\"identifier\": \"%02X:%02X:%02X:%02X:%02X:%02X\",\n", p_identifier[0], p_identifier[1], p_identifier[2], p_identifier[3], p_identifier[4], p_identifier[5]);
 
@@ -86,6 +87,8 @@ static char* json_body(unsigned char* p_identifier, benchmarkData* p_data, char*
         free(p_tmp);
     }
 
+    printf("[+] Json body created\n");
+
     return p_body;
 }
 
@@ -103,9 +106,9 @@ static char* format_request(char* p_url, char* p_host, char* p_endpoint, char* p
     return p_request;
 }
 
-static char* extract_value(const char* p_json, char* p_key) {
+static unsigned char* extract_value(const char* p_json, char* p_key) {
     char *p_keyPos = strstr(p_json, p_key);
-    char* p_value = NULL;
+    unsigned char* p_value = NULL;
     if (p_keyPos) {
         char *start = strchr(p_keyPos, ':');
         if (start) {
@@ -113,8 +116,8 @@ static char* extract_value(const char* p_json, char* p_key) {
             char *end = strchr(start, '"');
             if (end) {
                 size_t length = end - start;
-                p_value = (char*)malloc(length + 1);
-                strncpy(p_value, start, length);
+                p_value = (unsigned char*)malloc(length + 1);
+                strncpy((char*)p_value, start, length);
                 p_value[length] = '\0';
             }
         }
@@ -214,7 +217,7 @@ static char* contact_server(unsigned char* p_identifier, benchmarkData* p_data, 
     return p_response; 
 }
 
-char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, char** p_algo, char** p_iv) {
+unsigned char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, unsigned char** p_algo, unsigned char** p_iv) {
     char* p_response = contact_server(p_identifier, p_data, "benchmark", GET_ENC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
@@ -222,14 +225,14 @@ char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, cha
     /* Get key value */
     *p_algo = extract_value(p_response, "algorithm");
 
-    char* p_key = extract_value(json_body, "encryptKey");
+    unsigned char* p_key = extract_value(json_body, "encryptKey");
 
     if (*p_algo != NULL )
     {
-        if (strcmp(*p_algo, "AES-256") == 0)
+        if (strcmp((char*)*p_algo, "AES-256") == 0)
         {
             *p_iv = extract_value(json_body, "iv");
-        } else if (strcmp(*p_algo, "CHACHA20") == 0)
+        } else if (strcmp((char*)*p_algo, "CHACHA20") == 0)
         {
             *p_iv = extract_value(json_body, "nonce");
         }
@@ -241,7 +244,7 @@ char* get_encryption_key(unsigned char* p_identifier, benchmarkData* p_data, cha
     return p_key;
 }
 
-char* get_decryption_key(unsigned char* p_identifier, char** p_algo, char** p_iv) {
+unsigned char* get_decryption_key(unsigned char* p_identifier, unsigned char** p_algo, unsigned char** p_iv) {
     char* p_response = contact_server(p_identifier, NULL, NULL, GET_DEC_KEY_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_POST);
 
     char* json_body = extract_json_body(p_response);
@@ -249,12 +252,12 @@ char* get_decryption_key(unsigned char* p_identifier, char** p_algo, char** p_iv
     /* Get key value */
     *p_algo = extract_value(p_response, "algorithm");
 
-    char* p_key = extract_value(json_body, "decryptKey");
+    unsigned char* p_key = extract_value(json_body, "decryptKey");
 
-    if (strcmp(*p_algo, "AES-256") == 0)
+    if (strcmp((char*)*p_algo, "AES-256") == 0)
     {
         *p_iv = extract_value(json_body, "iv");
-    } else if (strcmp(*p_algo, "CHACHA20") == 0)
+    } else if (strcmp((char*)*p_algo, "CHACHA20") == 0)
     {
         *p_iv = extract_value(json_body, "nonce");
     }
@@ -292,8 +295,6 @@ void delete_id(unsigned char* p_id)
     char* p_response = contact_server(p_id, NULL, NULL, DEL_IDENTIFIER_ENDPOINT, API_URL, KEY_HOST, KEY_PORT, REQ_DEL);
 
     printf("[+] Identifier deleted\n");
-
-    printf("[+] Response: %s\n", p_response);
 
     free(p_response);
 }

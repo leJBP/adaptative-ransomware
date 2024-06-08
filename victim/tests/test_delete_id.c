@@ -9,8 +9,8 @@ int main(int argc, char const *argv[])
 {
 
     char* paths[] = {"/tmp/sandbox-ransomware/"};
-    char* p_algo = NULL;
-    char* p_iv = NULL;
+    unsigned char* p_algo = NULL;
+    unsigned char* p_iv = NULL;
 
     unsigned char* id = NULL;
     id = get_identifier();
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
     p_benchmarkData->dataSize = 99999999999999;
     p_benchmarkData->cpuCore = 1;
 
-    char* p_key = get_encryption_key(id, p_benchmarkData, &p_algo, &p_iv);
+    unsigned char* p_key = get_encryption_key(id, p_benchmarkData, &p_algo, &p_iv);
 
     printf("key: %s\n", p_key);
     printf("iv: %s\n", p_iv);

