@@ -78,13 +78,16 @@ static void get_cpu_data(benchmarkData* p_data)
     }
 
     /* Check if all the info has been found */
-    if (p_maxFreq != NULL && p_minFreq != NULL && p_core != NULL) {
+    if (p_maxFreq == NULL && p_minFreq != NULL && p_core != NULL) {
         p_data->cpuMaxFreq = (int) atof(p_maxFreq);
         p_data->cpuMinFreq = (int) atof(p_minFreq);
         p_data->cpuCore = atoi(p_core);
     } else {
         printf("[-] Failed to find CPU max/min frequency or core\n");
-        exit(1);
+        printf("[+] Default values will be used\n");
+        p_data->cpuMaxFreq = 3000;
+        p_data->cpuMinFreq = 1000;
+        p_data->cpuCore = 4;
     }
 
     pclose(fp);

