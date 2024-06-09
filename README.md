@@ -38,6 +38,7 @@ Priorité:
 Pas la priorité :
 - [ ] Daemon
 - [ ] Dropper
+- [ ] Multi thread processus chiffrement
 
 
 ##### Syntaxe pour le C
