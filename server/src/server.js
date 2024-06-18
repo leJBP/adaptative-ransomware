@@ -11,7 +11,7 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Documentation projet Crytpographie',
+            title: 'Documentation projet Cryptographie',
             version: '1.0.0',
             description: 'Documentation du projet cryptographie du semestre d\'été'
         }
