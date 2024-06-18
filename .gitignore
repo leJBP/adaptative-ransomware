@@ -1,0 +1,16 @@
+.vscode
+*.o
+ransomware
+test_rsa
+test_aes
+test_chacha20
+test_connection
+test_get_identifier
+test_delete_id
+test_get_login
+test.txt
+*.pem
+cle.py
+/.idea/
+/server/node_modules/
+/server_old/
