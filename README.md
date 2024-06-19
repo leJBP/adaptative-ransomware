@@ -4,10 +4,10 @@ Adaptative encryption method ransomware.
 
 ## Description
 
-This ransomware project is an attempt to create a ransomware which is able to choose among few encryption methods (AES, Chacha20, RSA) in aim to optimize time performance.
+This ransomware project is an attempt to create a ransomware which is able to choose between few encryption methods (AES, Chacha20, RSA) in aim to optimize time performance.
 The ransomware is in two parts, the first one is the C2 which deal with key storage and generation. The second one is the ransomware executed on victim PC.
 
-For now this ransomware is only useable on Linux based system due to the way we handle the benchmark.
+For now, this ransomware is only useable on Linux based system due to the way we handle the benchmark.
 
 ## Legal disclaimer
 
@@ -15,11 +15,11 @@ Usage of anything presented in this repo to attack targets without prior mutual 
 
 ## Installation requirements
 
-I recommand you to use the provided docker compose to use this project, by following this advice you can skip this section. If you really want to use it without container feel free to setup it all by yourself, you'll find bellow what you need to install.
+I recommend you to use the provided docker compose to use this project, by following this advice you can skip this section. If you really want to use it without container feel free to setup it all by yourself, you'll find below what you need to install.
 
 ### C2 side
 
-The C2 use node to provide services, a postgreSQL database is used with it to store keys.
+The C2 uses node to provide services, a postgreSQL database is used with it to store keys.
 
 ```
 https://nodejs.org/en
@@ -42,11 +42,11 @@ You can find a docker compose file in the directory docker, by using the followi
 docker compose up
 ```
 
-In this infrastucture you can find the C2 and his database, furthermore there is also an other container where you can use the ransomware in a safe way.
+In this infrastructure you can find the C2 and his database, furthermore there is also another container where you can use the ransomware in a safe way.
 
 ### C2
 
-Once the project is started you can have access to the endpoint of the nodeJS server on this following URL:
+Once the project is started, you can have access to the endpoint of the nodeJS server on this following URL:
 
 ```
 http://localhost:5000/api-docs/
@@ -54,13 +54,13 @@ http://localhost:5000/api-docs/
 
 ### Ransomware
 
-Once the infrastructure is started you have to connect to the victim container. To compile the ransomware use this following command:
+Once the infrastructure is started, you have to connect to the victim container. To compile the ransomware use this following command:
 
 ```
 make all
 ```
 
-Once the ransomware is compiled you can use it in two way. The first one is in a sandbox for test purposes and the second one is unrestricted. By default, the unrestricted one will scan all following path during the indexing process, feel free to modify it in the code:
+Once the ransomware is compiled, you can use it in two ways. The first one is in a sandbox for test purposes and the second one is unrestricted. By default, the unrestricted one will scan all following paths during the indexing process, feel free to modify it in the code:
 
 ```
 /home/$USERNAME/Downloads/
@@ -71,13 +71,13 @@ Once the ransomware is compiled you can use it in two way. The first one is in a
 /home/$USERNAME/Documents/
 ```
 
-About the sandboxed mode the indexing process only scan the path `/tmp/sandbox-ransomware/` where beforehand five files are created and fill with this text `This is a useless file`.
+About the sandbox mode the indexing process only scan the path `/tmp/sandbox-ransomware/` where beforehand five files are created and fill with this text `This is a useless file`.
 
-Warning: if you encrypt in sandboxed mode you should decrypt in sandboxed mode to be able to re-encrypt. This warning also applied if you use the unrestricted mode.
+Warning: if you encrypt in sandbox mode you should decrypt in sandbox mode to be able to re-encrypt. This warning also applied if you use the unrestricted mode.
 
 #### Encryption
 
-To encrypt in sandboxed mode you can use the following command:
+To encrypt in sandbox mode you can use the following command:
 
 ```
 ./ransomware --encrypt
@@ -90,7 +90,7 @@ For the unrestricted mode use this command:
 ```
 #### Decryption
 
-To decrypt in sandboxed mode you can use the following command:
+To decrypt in sandbox mode you can use the following command:
 
 ```
 ./ransomware --decrypt
