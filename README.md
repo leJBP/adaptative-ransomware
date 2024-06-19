@@ -1,24 +1,30 @@
-## But
+# Adaptative ransomware
 
-Automatic ransomware on encryption algorithm choice
+Adaptative encryption method ransomware.
 
-### Choix à faire
+## Description
 
-- Langage utilisé
-    - Node.js (attaquant)
-    - C (victime)
-- Génération des clés
-- Chiffrement utilisé (RSA, AES, Chacha20)
-- Façon de procéder
-- Stockage des clés (postgreSQL)
-- Conception du programme
-- Faire benchmark chiffrement en fonction de la taille des données à chiffrer
+This ransomware project is an attempt to create a ransomware which is able to choose among few encryption methods (AES, Chacha20, RSA) in aim to optimize time performance.
+The ransomware is in two parts, the first one is the C2 which deal with key storage and generation. The second one is the ransomware executed on victim PC.
 
-#### Victim side to do list
+For now this ransomware is only useable on Linux based system due to the way we handle the benchmark.
 
-source : https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomware/4594
+## Legal disclaimer
 
-Priorité:
+Usage of anything presented in this repo to attack targets without prior mutual consent is illegal. It's the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program. Only use for educational purposes.
+
+## Installation requirements
+
+### C2 side
+
+### Ransomware side
+
+## Usage
+
+## To Do list
+
+### Victim side
+
 - [x] Find files to encrypt
 - [x] Retrieve key for encryption from attacker server
 - [x] Retrieve key for decryption from attacker server
@@ -32,16 +38,25 @@ Priorité:
 - [x] Refactoring functions
 - [x] Encrypt Chacha20
 - [x] Decrypt Chacha20
-- [ ] Main file
+- [x] Main file
 - [x] Docker environment to test ransomware
-
-Pas la priorité :
 - [ ] Daemon
 - [ ] Dropper
-- [ ] Multi thread processus chiffrement
+- [ ] Multi thread encryption process
 
+### C2 side
 
-##### Syntaxe pour le C
+- [x] Key generation
+- [x] Key storage in database
+- [x] Benchmark scoring
+- [ ] HTTPS
+- [ ] Refactoring victim ID
+
+## Inspiration
+
+https://0x00sec.org/t/how-ransomware-works-and-gonnacry-linux-ransomware/4594
+
+## Syntax used for C development
 
 https://stackoverflow.com/questions/1722112/what-are-the-most-common-naming-conventions-in-c
 
